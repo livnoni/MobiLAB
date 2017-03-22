@@ -10,49 +10,62 @@ import java.io.IOException;
 
 public class MainMenuActivity extends AppCompatActivity {
 
+    /**
+     * check box configuration object to hold configuration for each sensor
+     */
+
+    class config {
+        private CheckBox checkBox;
+        private Boolean active;
+        private Object data[];
+        private String id;
+
+        public config(CheckBox cb, Boolean bl, int dataCapacity, String name) {
+            this.id = name;
+            this.checkBox = cb;
+            this.active = bl;
+            if (dataCapacity > -1) {
+                this.data = new Object[dataCapacity];
+            }
+        }
+
+        public Boolean getState() {
+            return this.active;
+        }
+
+        public void changeState() {
+            active = !active;
+        }
+    }
+
     Button button;
-    Logger logger;
 
-    CheckBox gpsCB, cameraCB, smsCB, temperatureCB, batteryLevelCB, soundCB, barometerCB, ExternalSensorsCB;
-    boolean gps = false, camera = false, sms = false, temperature = false, batteryLevel = false, sound = false, barometer = false, ExternalSensors = false;
-
-    CheckBox[] checkBoxes = new CheckBox[8];
-    boolean[] boolCheckBoxes = new boolean[8];
+    private static Logger logger;
+    private config _gps, _camera, _sms, _temperature, _battery, _sound, _barometer, _externalSensors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // initialize
+        _gps = new config((CheckBox) findViewById(R.id.gpsCB), false, -1, "gps");                                      // no additional data
+        _camera = new config((CheckBox) findViewById(R.id.cameraCB), false, 2, "camera");                              // quality, interval
+        _sms = new config((CheckBox) findViewById(R.id.smsCB), false, 2, "sms");                                       // telephone number, interval
+        _temperature = new config((CheckBox) findViewById(R.id.temperatureCB), false, -1, "temperature");              // no additional data
+        _battery = new config((CheckBox) findViewById(R.id.batteryLevelCB), false, -1, "battery");                     // no additional data
+        _sound = new config((CheckBox) findViewById(R.id.soundCB), false, 2, "sound");                                 // interval, duration
+        _barometer = new config((CheckBox) findViewById(R.id.barometerCB), false, -1, "barometer");                    // no additional data
+        _externalSensors = new config((CheckBox) findViewById(R.id.ExternalSensorsCB), false, -1, "external sensor");  // no additional data
 
-        gpsCB = (CheckBox) findViewById(R.id.gpsCB);
-        cameraCB = (CheckBox) findViewById(R.id.cameraCB);
-        smsCB = (CheckBox) findViewById(R.id.smsCB);
-        temperatureCB = (CheckBox) findViewById(R.id.temperatureCB);
-        temperatureCB = (CheckBox) findViewById(R.id.temperatureCB);
-        batteryLevelCB = (CheckBox) findViewById(R.id.batteryLevelCB);
-        soundCB = (CheckBox) findViewById(R.id.soundCB);
-        barometerCB = (CheckBox) findViewById(R.id.barometerCB);
-        ExternalSensorsCB = (CheckBox) findViewById(R.id.ExternalSensorsCB);
-
-//        for (int i=0;i<8;i++)
-//        {
-//            checkBoxes[i].setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    boolCheckBoxes[i] = !boolCheckBoxes;
-//
-//                }
-//            });
-//        }
-
-        gpsCB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                gps = !gps;
-                logger.append("gps set to: " + gps);
-            }
-        });
-
+        // set listeners
+        setListener(_barometer);
+        setListener(_camera);
+        setListener(_sms);
+        setListener(_temperature);
+        setListener(_battery);
+        setListener(_sound);
+        setListener(_barometer);
+        setListener(_externalSensors);
 
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +76,20 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * set the on click listener to specific sensor
+     *
+     * @param conf which is the sensor
+     */
+    private void setListener(final config conf) {
+        conf.checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                conf.changeState();
+                logger.append(conf.id + " changed --> " + conf.getState());
+            }
+        });
+    }
 
     @Override
     protected void onDestroy() {

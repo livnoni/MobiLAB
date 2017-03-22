@@ -9,6 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -125,11 +128,26 @@ public class MainMenuActivity extends AppCompatActivity {
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
-
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 //                take data from popup
-                dialog.dismiss();
+//                RadioGroup radioGroup = (RadioGroup) findViewById(R.id.resolutionGroup);
+//                int selectedId = radioGroup.getCheckedRadioButtonId();
+//                RadioButton radioButton = (RadioButton) findViewById(selectedId);
+//                Toast.makeText(MainMenuActivity.this, selectedId + "", Toast.LENGTH_SHORT).show();
+//
+//                // get selected radio button from radioGroup
+//                int selectedId = radioGroup.getCheckedRadioButtonId();
+//
+//                // find the radiobutton by returned id
+//                radioButton = (RadioButton) findViewById(selectedId);
+//                dialog.dismiss();
             }
         });
         builder.show();

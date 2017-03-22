@@ -10,20 +10,24 @@
         android:text="  Resoution:   " />
 
     <RadioGroup
+        android:id="@+id/resolutionGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <RadioButton
+            android:id="@+id/r640x480"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="640x480" />
 
         <RadioButton
+            android:id="@+id/r800x600"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="800x600" />
 
         <RadioButton
+            android:id="@+id/r1024x768"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1024x768" />
@@ -35,6 +39,7 @@
         android:text="          Interval:   " />
 
     <RadioGroup
+        android:id="@+id/cameraIntervalGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 

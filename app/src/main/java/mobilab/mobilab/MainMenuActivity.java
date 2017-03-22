@@ -103,29 +103,36 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * this function receive configuration object as parameter and shows a popup with his configuration options
+     * (if more sensors or data is added make sure to add relevant popups here!)
+     *
+     * @param conf
+     */
     public void showPopup(config conf) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // ...Irrelevant code for customizing the buttons and title
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.alert_label_editor, null);
+        View dialogView = null;
+        switch (conf.id) {
+            case "camera":
+                dialogView = inflater.inflate(R.layout.camera_popup, null);
+                break;
+            case "sms":
+                dialogView = inflater.inflate(R.layout.sms_popup, null);
+                break;
+            case "sound":
+                dialogView = inflater.inflate(R.layout.sound_popup, null);
+                break;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
 
-        //EditText editText = (EditText) dialogView.findViewById(R.id.);
-        CheckBox checkBox = (CheckBox) dialogView.findViewById(R.id.checkBox1);
-        //checkBox.setText("test label");
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                data[0] = input1.getText();
-                logger.append(data[0] + "");
+//                take data from popup
                 dialog.dismiss();
             }
         });
         builder.show();
-
     }
 
     @Override
@@ -136,8 +143,6 @@ public class MainMenuActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 }
 

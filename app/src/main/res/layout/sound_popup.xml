@@ -4,10 +4,11 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="  Resoution:   " />
+        android:text="  Duration:   " />
 
     <RadioGroup
         android:layout_width="wrap_content"
@@ -16,17 +17,17 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="640x480" />
+            android:text="30 sec" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="800x600" />
+            android:text="60 sec" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1024x768" />
+            android:text="120 sec" />
     </RadioGroup>
 
     <TextView
@@ -41,16 +42,16 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10 sec" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="30 sec" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="60 sec" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="120 sec" />
     </RadioGroup>
 </LinearLayout>

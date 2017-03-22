@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -43,17 +44,27 @@ public class MainMenuActivity extends AppCompatActivity {
         }
 
         public void showPopup() {
-            final EditText input = new EditText(MainMenuActivity.this);
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
-            builder.setView(input);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    data[0] = input.getText().toString();
-                    logger.append(data[0] + "");
-                    dialog.dismiss();
-                }
-            });
-            builder.show();
+            // TODO : finish showpopup view
+//            AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
+//            // ...Irrelevant code for customizing the buttons and title
+//            LayoutInflater inflater = MainMenuActivity.this.getLayoutInflater();
+//            View dialogView = inflater.inflate(R.layout.alert_label_editor, null);
+//            builder.setView(dialogView);
+//
+//            //EditText editText = (EditText) dialogView.findViewById(R.id.);
+//            CheckBox checkBox = (CheckBox) dialogView.findViewById(R.id.checkBox1);
+//            //checkBox.setText("test label");
+//            AlertDialog alertDialog = builder.create();
+//            alertDialog.show();
+//
+//            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int whichButton) {
+//                    data[0] = input1.getText();
+//                    logger.append(data[0] + "");
+//                    dialog.dismiss();
+//                }
+//            });
+//            builder.show();
         }
     }
 
@@ -66,6 +77,7 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // initialize
         _gps = new config((CheckBox) findViewById(R.id.gpsCB), false, -1, "gps");                                      // no additional data
         _camera = new config((CheckBox) findViewById(R.id.cameraCB), false, 2, "camera");                              // quality, interval

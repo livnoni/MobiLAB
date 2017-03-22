@@ -1,10 +1,13 @@
 package mobilab.mobilab;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 
 import java.io.IOException;
 
@@ -19,6 +22,7 @@ public class MainMenuActivity extends AppCompatActivity {
         private Boolean active;
         private Object data[];
         private String id;
+        private Boolean alertDialog = false;
 
         public config(CheckBox cb, Boolean bl, int dataCapacity, String name) {
             this.id = name;
@@ -26,6 +30,7 @@ public class MainMenuActivity extends AppCompatActivity {
             this.active = bl;
             if (dataCapacity > -1) {
                 this.data = new Object[dataCapacity];
+                alertDialog = true;
             }
         }
 
@@ -35,6 +40,20 @@ public class MainMenuActivity extends AppCompatActivity {
 
         public void changeState() {
             active = !active;
+        }
+
+        public void showPopup() {
+            final EditText input = new EditText(MainMenuActivity.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
+            builder.setView(input);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    data[0] = input.getText().toString();
+                    logger.append(data[0] + "");
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
         }
     }
 
@@ -58,6 +77,7 @@ public class MainMenuActivity extends AppCompatActivity {
         _externalSensors = new config((CheckBox) findViewById(R.id.ExternalSensorsCB), false, -1, "external sensor");  // no additional data
 
         // set listeners
+        setListener(_gps);
         setListener(_barometer);
         setListener(_camera);
         setListener(_sms);
@@ -86,6 +106,9 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 conf.changeState();
+                if (conf.alertDialog && conf.getState()) {
+                    conf.showPopup();
+                }
                 logger.append(conf.id + " changed --> " + conf.getState());
             }
         });
@@ -99,5 +122,10 @@ public class MainMenuActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
 }
+
+
+

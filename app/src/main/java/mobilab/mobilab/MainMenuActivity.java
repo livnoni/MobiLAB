@@ -1,16 +1,11 @@
 package mobilab.mobilab;
 
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class MainMenuActivity extends AppCompatActivity {
@@ -54,7 +49,7 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 gps = !gps;
-                logger.writeLog("gps set to: " + gps);
+                logger.append("gps set to: " + gps);
             }
         });
 
@@ -63,7 +58,7 @@ public class MainMenuActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                logger.writeLog("this is check.");
+                logger.append("this is check.");
             }
         });
     }

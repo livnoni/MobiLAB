@@ -43,29 +43,6 @@ public class MainMenuActivity extends AppCompatActivity {
             active = !active;
         }
 
-        public void showPopup() {
-            // TODO : finish showpopup view
-//            AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
-//            // ...Irrelevant code for customizing the buttons and title
-//            LayoutInflater inflater = MainMenuActivity.this.getLayoutInflater();
-//            View dialogView = inflater.inflate(R.layout.alert_label_editor, null);
-//            builder.setView(dialogView);
-//
-//            //EditText editText = (EditText) dialogView.findViewById(R.id.);
-//            CheckBox checkBox = (CheckBox) dialogView.findViewById(R.id.checkBox1);
-//            //checkBox.setText("test label");
-//            AlertDialog alertDialog = builder.create();
-//            alertDialog.show();
-//
-//            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int whichButton) {
-//                    data[0] = input1.getText();
-//                    logger.append(data[0] + "");
-//                    dialog.dismiss();
-//                }
-//            });
-//            builder.show();
-        }
     }
 
     Button button;
@@ -119,11 +96,36 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View view) {
                 conf.changeState();
                 if (conf.alertDialog && conf.getState()) {
-                    conf.showPopup();
+                    showPopup(conf);
                 }
                 logger.append(conf.id + " changed --> " + conf.getState());
             }
         });
+    }
+
+    public void showPopup(config conf) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.alert_label_editor, null);
+        builder.setView(dialogView);
+
+        //EditText editText = (EditText) dialogView.findViewById(R.id.);
+        CheckBox checkBox = (CheckBox) dialogView.findViewById(R.id.checkBox1);
+        //checkBox.setText("test label");
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                data[0] = input1.getText();
+                logger.append(data[0] + "");
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+
     }
 
     @Override

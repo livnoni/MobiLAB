@@ -18,11 +18,11 @@ public class MainMenuActivity extends AppCompatActivity {
     Button button;
     Logger logger;
 
-    CheckBox gpsCB,cameraCB,smsCB,temperatureCB,batteryLevelCB,soundCB,barometerCB,ExternalSensorsCB;
-    boolean gps=false,camera=false,sms=false,temperature=false,batteryLevel=false,sound=false,barometer=false,ExternalSensors=false;
+    CheckBox gpsCB, cameraCB, smsCB, temperatureCB, batteryLevelCB, soundCB, barometerCB, ExternalSensorsCB;
+    boolean gps = false, camera = false, sms = false, temperature = false, batteryLevel = false, sound = false, barometer = false, ExternalSensors = false;
 
-    CheckBox [] checkBoxes = new CheckBox[8];
-    boolean [] boolCheckBoxes = new boolean[8];
+    CheckBox[] checkBoxes = new CheckBox[8];
+    boolean[] boolCheckBoxes = new boolean[8];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,7 @@ public class MainMenuActivity extends AppCompatActivity {
         soundCB = (CheckBox) findViewById(R.id.soundCB);
         barometerCB = (CheckBox) findViewById(R.id.barometerCB);
         ExternalSensorsCB = (CheckBox) findViewById(R.id.ExternalSensorsCB);
-        
+
 //        for (int i=0;i<8;i++)
 //        {
 //            checkBoxes[i].setOnClickListener(new View.OnClickListener() {
@@ -53,8 +53,8 @@ public class MainMenuActivity extends AppCompatActivity {
         gpsCB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                gps =!gps;
-                logger.writeLog("gps set to: "+gps);
+                gps = !gps;
+                logger.writeLog("gps set to: " + gps);
             }
         });
 
@@ -62,26 +62,11 @@ public class MainMenuActivity extends AppCompatActivity {
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 logger.writeLog("this is check.");
             }
         });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     @Override

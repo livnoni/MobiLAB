@@ -13,31 +13,28 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 
-public class Logger extends Application
-{
+public class Logger extends Application {
     private static File logger;
     private static FileOutputStream fos;
 
 
-    public Logger() throws IOException
-    {
+    public Logger() throws IOException {
         logger = getOutputMediaFile();
         fos = new FileOutputStream(logger);
 
     }
 
-    public static void writeLog(String message)
-    {
+    public static void writeLog(String message) {
         try {
-            fos.write((System.currentTimeMillis()+":\t"+message+"\n").getBytes());
-            Log.i("Logger:",message+"");
-        } catch (IOException e)
-        {
+            fos.write((System.currentTimeMillis() + ":\t" + message + "\n").getBytes());
+            Log.i("Logger:", message + "");
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
 
     }
+
     private File getOutputMediaFile() {
         File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "MobiLAB");
         if (!mediaStorageDir.exists()) {
@@ -49,15 +46,14 @@ public class Logger extends Application
         // Create a media file name
 
         File mediaFile;
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator +"Logs.txt");
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + "Logs.txt");
 
         return mediaFile;
     }
 
-    public static void onDestroy() throws IOException
-    {
+    public static void onDestroy() throws IOException {
         writeLog("Finished.");
-       // fos.close();
+        // fos.close();
     }
 
 

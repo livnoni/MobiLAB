@@ -11,75 +11,75 @@
     tools:context="mobilab.mobilab.MainMenuActivity">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:orientation="vertical">
 
         <TextView
-            android:text="What to monitor?"
+            android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/textView"
+            android:text="What to monitor?"
             android:textAlignment="center" />
 
         <CheckBox
-            android:text="GPS"
+            android:id="@+id/gpsCB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/gpsCB" />
+            android:text="GPS" />
 
         <CheckBox
-            android:text="Camera"
+            android:id="@+id/cameraCB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/cameraCB" />
+            android:text="Camera" />
 
         <CheckBox
-            android:text="SMS"
+            android:id="@+id/smsCB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/smsCB" />
+            android:text="SMS" />
 
         <CheckBox
-            android:text="Temperature "
+            android:id="@+id/temperatureCB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/temperatureCB" />
+            android:text="Temperature " />
 
         <CheckBox
-            android:text="Battery level "
+            android:id="@+id/batteryLevelCB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/batteryLevelCB" />
+            android:text="Battery level " />
 
         <CheckBox
-            android:text="Sound"
+            android:id="@+id/soundCB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/soundCB" />
+            android:text="Sound" />
 
         <CheckBox
-            android:text="Barometer "
+            android:id="@+id/barometerCB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/barometerCB" />
+            android:text="Barometer " />
 
         <CheckBox
-            android:text="External sensors"
+            android:id="@+id/ExternalSensorsCB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/ExternalSensorsCB" />
+            android:text="External sensors" />
 
         <Button
-            android:text="Button"
+            android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="12dp"
+            android:text="Button" />
     </LinearLayout>
 
 </RelativeLayout>

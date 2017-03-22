@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 //ToDo: set logic of login
-              //attemptLogin();
+                //attemptLogin();
                 logger.writeLog("Sign in clicked.");
                 Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
                 startActivity(intent);

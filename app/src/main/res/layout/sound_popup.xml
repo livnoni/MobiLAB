@@ -4,56 +4,55 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="  Duration:   " />
+        android:text="@string/duration" />
 
     <RadioGroup
+        android:id="@+id/durationGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        android:id="@+id/durationGroup"
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="30 sec" />
+            android:text="@string/_30sec" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="60 sec" />
+            android:text="@string/_60sec" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="120 sec" />
+            android:text="@string/_120sec" />
     </RadioGroup>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="          Interval:   " />
+        android:text="@string/interval" />
 
     <RadioGroup
+        android:id="@+id/soundIntervalGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        android:id="@+id/soundIntervalGroup"
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="30 sec" />
+            android:text="@string/_30sec" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="60 sec" />
+            android:text="@string/_60sec" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="120 sec" />
+            android:text="@string/_120sec" />
     </RadioGroup>
 </LinearLayout>

@@ -7,12 +7,12 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Telephone Number" />
+        android:hint="@string/telNo" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Interval:" />
+        android:text="@string/interval2" />
 
     <RadioGroup
         android:id="@+id/smsIntervalGroup"
@@ -22,16 +22,16 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10 sec" />
+            android:text="@string/_10sec" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="30 sec" />
+            android:text="@string/_30sec" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="60 sec" />
+            android:text="@string/_60sec" />
     </RadioGroup>
 </LinearLayout>

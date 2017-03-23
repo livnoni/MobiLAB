@@ -5,9 +5,10 @@
     android:orientation="horizontal">
 
     <TextView
+        android:id="@+id/resolutionTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="  Resoution:   " />
+        android:text="@string/resolution" />
 
     <RadioGroup
         android:id="@+id/resolutionGroup"
@@ -18,25 +19,26 @@
             android:id="@+id/r640x480"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="640x480" />
+            android:text="@string/small" />
 
         <RadioButton
             android:id="@+id/r800x600"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="800x600" />
+            android:text="@string/medium" />
 
         <RadioButton
             android:id="@+id/r1024x768"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1024x768" />
+            android:text="@string/large" />
     </RadioGroup>
 
     <TextView
+        android:id="@+id/cameraIntervalTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="          Interval:   " />
+        android:text="@string/interval" />
 
     <RadioGroup
         android:id="@+id/cameraIntervalGroup"
@@ -44,18 +46,21 @@
         android:layout_height="wrap_content">
 
         <RadioButton
+            android:id="@+id/camera10sec"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10 sec" />
+            android:text="@string/_10sec" />
 
         <RadioButton
+            android:id="@+id/camera30sec"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="30 sec" />
+            android:text="@string/_30sec" />
 
         <RadioButton
+            android:id="@+id/camera60sec"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="60 sec" />
+            android:text="@string/_60sec" />
     </RadioGroup>
 </LinearLayout>

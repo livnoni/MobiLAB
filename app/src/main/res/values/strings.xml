@@ -10,6 +10,18 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
+    <string name="resolution">  Resolution:   </string>
+    <string name="small">640x480</string>
+    <string name="medium">800x600</string>
+    <string name="large">1024x768</string>
+    <string name="interval">          Interval:   </string>
+    <string name="_10sec">10 sec</string>
+    <string name="_30sec">30 sec</string>
+    <string name="_60sec">60 sec</string>
+    <string name="_120sec">120 sec</string>
+    <string name="telNo">Telephone Number</string>
+    <string name="interval2">Interval:</string>
+    <string name="duration">  Duration:   </string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>

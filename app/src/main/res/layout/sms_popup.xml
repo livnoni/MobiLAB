@@ -5,6 +5,7 @@
     android:orientation="vertical">
 
     <EditText
+        android:id="@+id/telNo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/telNo" />
@@ -20,16 +21,19 @@
         android:layout_height="wrap_content">
 
         <RadioButton
+            android:id="@+id/sms10sec"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_10sec" />
 
         <RadioButton
+            android:id="@+id/sms30sec"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_30sec" />
 
         <RadioButton
+            android:id="@+id/sms60sec"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_60sec" />

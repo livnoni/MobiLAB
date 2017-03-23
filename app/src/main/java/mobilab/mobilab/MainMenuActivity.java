@@ -53,31 +53,18 @@ public class MainMenuActivity extends AppCompatActivity {
     private static Logger logger;
     private config _gps, _camera, _sms, _temperature, _battery, _sound, _barometer, _externalSensors;
 
+    /**
+     * onCreate method initial all global variables and set onClickListeners
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // initialize
-        _gps = new config((CheckBox) findViewById(R.id.gpsCB), false, -1, "gps");                                      // no additional data
-        _camera = new config((CheckBox) findViewById(R.id.cameraCB), false, 2, "camera");                              // quality, interval
-        _sms = new config((CheckBox) findViewById(R.id.smsCB), false, 2, "sms");                                       // telephone number, interval
-        _temperature = new config((CheckBox) findViewById(R.id.temperatureCB), false, -1, "temperature");              // no additional data
-        _battery = new config((CheckBox) findViewById(R.id.batteryLevelCB), false, -1, "battery");                     // no additional data
-        _sound = new config((CheckBox) findViewById(R.id.soundCB), false, 2, "sound");                                 // interval, duration
-        _barometer = new config((CheckBox) findViewById(R.id.barometerCB), false, -1, "barometer");                    // no additional data
-        _externalSensors = new config((CheckBox) findViewById(R.id.ExternalSensorsCB), false, -1, "external sensor");  // no additional data
-
-        // set listeners
-        setListener(_gps);
-        setListener(_barometer);
-        setListener(_camera);
-        setListener(_sms);
-        setListener(_temperature);
-        setListener(_battery);
-        setListener(_sound);
-        setListener(_barometer);
-        setListener(_externalSensors);
+        initConfigurations();
+        setAllListeners();
 
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +94,37 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     /**
+     * initialize all configuration objects to initial values (used only in onCreate method
+     */
+    public void initConfigurations() {
+        _gps = new config((CheckBox) findViewById(R.id.gpsCB), false, -1, "gps");                                      // no additional data
+        _camera = new config((CheckBox) findViewById(R.id.cameraCB), false, 2, "camera");                              // quality, interval
+        _sms = new config((CheckBox) findViewById(R.id.smsCB), false, 2, "sms");                                       // telephone number, interval
+        _temperature = new config((CheckBox) findViewById(R.id.temperatureCB), false, -1, "temperature");              // no additional data
+        _battery = new config((CheckBox) findViewById(R.id.batteryLevelCB), false, -1, "battery");                     // no additional data
+        _sound = new config((CheckBox) findViewById(R.id.soundCB), false, 2, "sound");                                 // interval, duration
+        _barometer = new config((CheckBox) findViewById(R.id.barometerCB), false, -1, "barometer");                    // no additional data
+        _externalSensors = new config((CheckBox) findViewById(R.id.ExternalSensorsCB), false, -1, "external sensor");  // no additional data
+    }
+
+    /**
+     * set onClickListeners to all configuration objects (checkboxes)
+     */
+
+    public void setAllListeners() {
+        // set listeners
+        setListener(_gps);
+        setListener(_barometer);
+        setListener(_camera);
+        setListener(_sms);
+        setListener(_temperature);
+        setListener(_battery);
+        setListener(_sound);
+        setListener(_barometer);
+        setListener(_externalSensors);
+    }
+
+    /**
      * this function receive configuration object as parameter and shows a popup with his configuration options
      * (if more sensors or data is added make sure to add relevant popups here!)
      *
@@ -126,7 +144,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 dialogView = inflater.inflate(R.layout.sound_popup, null);
                 break;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -136,18 +154,16 @@ public class MainMenuActivity extends AppCompatActivity {
         });
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
+                    
 //                take data from popup
 //                RadioGroup radioGroup = (RadioGroup) findViewById(R.id.resolutionGroup);
+//                get selected radio button from radioGroup
 //                int selectedId = radioGroup.getCheckedRadioButtonId();
-//                RadioButton radioButton = (RadioButton) findViewById(selectedId);
+//                find the radio button by returned id
+//                RadioButton radioButton = (RadioButton) findViewById(whichButton);
 //                Toast.makeText(MainMenuActivity.this, selectedId + "", Toast.LENGTH_SHORT).show();
-//
-//                // get selected radio button from radioGroup
-//                int selectedId = radioGroup.getCheckedRadioButtonId();
-//
-//                // find the radiobutton by returned id
-//                radioButton = (RadioButton) findViewById(selectedId);
-//                dialog.dismiss();
+
+                dialog.dismiss();
             }
         });
         builder.show();

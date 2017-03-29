@@ -13,6 +13,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -44,6 +45,11 @@ public class MainMenuActivity extends AppCompatActivity {
             {
                 this.data.put("interval",30);
                 this.data.put("resolution","640x480");
+            }
+            if(name=="sms")
+            {
+                this.data.put("telephone","0000000000");
+                this.data.put("interval","30");
             }
         }
 
@@ -150,6 +156,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 showCameraPropertiesPopUp(conf);
                 break;
             case "sms":
+                showSMSPropertiesPopUp(conf);
                 break;
             case "sound":
                 break;
@@ -163,7 +170,7 @@ public class MainMenuActivity extends AppCompatActivity {
         dialog.setTitle("Camera Properties");
         dialog.show();
 
-        Button bApprove = (Button) dialog.findViewById(R.id.bApprove);
+        Button bApprove = (Button) dialog.findViewById(R.id.CameraApprove);
         final RadioGroup intervalRadioGroup = (RadioGroup) dialog.findViewById(R.id.cameraIntervalGroup);
         final RadioGroup resolutionRadioGroup = (RadioGroup) dialog.findViewById(R.id.resolutionGroup);
 
@@ -222,6 +229,97 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void showSMSPropertiesPopUp(final config conf)
+    {
+        final Dialog dialog=new Dialog(MainMenuActivity.this);
+        dialog.setContentView(R.layout.sms_popup);
+        dialog.setTitle("SMS Properties");
+        dialog.show();
+
+        Button bApprove = (Button) dialog.findViewById(R.id.SMSApprove);
+        final RadioGroup SMSRadioGroup = (RadioGroup) dialog.findViewById(R.id.smsIntervalGroup);
+
+        final EditText telephoneText = (EditText) dialog.findViewById(R.id.telNo);
+
+        //Make radio interval button clicked:
+        int lastIntervalId = getResources().getIdentifier("sms"+conf.data.get("interval")+"sec", "id", getPackageName());
+        RadioButton LastRadioButton = (RadioButton) dialog.findViewById(lastIntervalId);
+        LastRadioButton.setChecked(true);
+
+        //Make telephoneText show the last data:
+        String lastTelephoneVal = (String)conf.data.get("telephone");
+        if(lastTelephoneVal!="0000000000")
+        {
+            telephoneText.setText(lastTelephoneVal, TextView.BufferType.EDITABLE);
+        }
+
+
+        bApprove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                int intervalSelectedId = SMSRadioGroup.getCheckedRadioButtonId();
+
+                if(intervalSelectedId ==2131493041)
+                {
+                    conf.changeData("interval",10);
+                    Logger.append("SMS interval changed to 10 sec");
+                }
+                if(intervalSelectedId ==2131493042)
+                {
+                    conf.changeData("interval",30);
+                    Logger.append("SMS interval changed to 30 sec");
+                }
+                if(intervalSelectedId ==2131493043)
+                {
+                    conf.changeData("interval",60);
+                    Logger.append("SMS interval changed to 60 sec");
+                }
+
+                String telephoneNumber = telephoneText.getText().toString();
+
+                if(telephoneNumber.isEmpty())
+                {
+                    AlertDialog alertDialog = new AlertDialog.Builder(MainMenuActivity.this).create();
+                    alertDialog.setTitle("Enter Phone number");
+                    alertDialog.setMessage("Please write a phone destination number for sending SMS");
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+                else if(telephoneNumber.length()!=10)
+                {
+                    AlertDialog alertDialog = new AlertDialog.Builder(MainMenuActivity.this).create();
+                    alertDialog.setTitle("Enter Phone number");
+                    alertDialog.setMessage("Please write a valid phone number !\nfor example: 0556699919 ");
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+                else
+                {
+                    conf.changeData("telephone",telephoneNumber);
+                    Toast.makeText(getApplicationContext(),"SMS will set to: "+conf.data.get("telephone")+" every "+conf.data.get("interval")
+                            +" sec" , Toast.LENGTH_SHORT).show();
+
+                    dialog.dismiss();
+                }
+            }
+        });
+    }
+
+    
+
+
 
 
 

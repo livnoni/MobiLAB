@@ -4,38 +4,53 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/telNo"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/telNo" />
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/interval2" />
-
-    <RadioGroup
-        android:id="@+id/smsIntervalGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <RadioButton
-            android:id="@+id/sms10sec"
+        <EditText
+            android:id="@+id/telNo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/_10sec" />
+            android:hint="@string/telNo" />
 
-        <RadioButton
-            android:id="@+id/sms30sec"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/_30sec" />
+            android:text="@string/interval2" />
 
-        <RadioButton
-            android:id="@+id/sms60sec"
+        <RadioGroup
+            android:id="@+id/smsIntervalGroup"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/sms10sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_10sec" />
+
+            <RadioButton
+                android:id="@+id/sms30sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_30sec" />
+
+            <RadioButton
+                android:id="@+id/sms60sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_60sec" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/SMSApprove"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/_60sec" />
-    </RadioGroup>
+            android:text="Approve" />
+
+    </LinearLayout>
+
+
 </LinearLayout>

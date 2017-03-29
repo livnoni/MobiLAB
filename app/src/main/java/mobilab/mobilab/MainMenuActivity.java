@@ -46,11 +46,17 @@ public class MainMenuActivity extends AppCompatActivity {
                 this.data.put("interval",30);
                 this.data.put("resolution","640x480");
             }
-            if(name=="sms")
+            if(name=="sms")    //set default data for SMS
             {
                 this.data.put("telephone","0000000000");
                 this.data.put("interval","30");
             }
+            if(name=="sound")    //set default data for sound
+            {
+                this.data.put("duration","60");
+                this.data.put("interval","30");
+            }
+
         }
 
         public Boolean getState() {
@@ -159,6 +165,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 showSMSPropertiesPopUp(conf);
                 break;
             case "sound":
+                showSoundPropertiesPopUp(conf);
                 break;
         }
     }
@@ -317,10 +324,71 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
-    
+    public void showSoundPropertiesPopUp(final config conf)
+    {
+        final Dialog dialog=new Dialog(MainMenuActivity.this);
+        dialog.setContentView(R.layout.sound_popup);
+        dialog.setTitle("Sound Properties");
+        dialog.show();
 
+        Button bApprove = (Button) dialog.findViewById(R.id.soundApprove);
+        final RadioGroup intervalRadioGroup = (RadioGroup) dialog.findViewById(R.id.soundIntervalGroup);
+        final RadioGroup durationRadioGroup = (RadioGroup) dialog.findViewById(R.id.durationGroup);
 
+        //Make radio interval button clicked:
+        int lastIntervalId = getResources().getIdentifier("iDuration"+conf.data.get("interval")+"sec", "id", getPackageName());
+        RadioButton LastRadioButton = (RadioButton) dialog.findViewById(lastIntervalId);
+        LastRadioButton.setChecked(true);
 
+        //Make radio duration button clicked:
+        int lastDurationId = getResources().getIdentifier("sDuration"+conf.data.get("duration")+"sec", "id", getPackageName());
+        RadioButton LastDurationButton = (RadioButton) dialog.findViewById(lastDurationId);
+        LastDurationButton.setChecked(true);
+
+        bApprove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
+                int DurationSelectedId = durationRadioGroup.getCheckedRadioButtonId();
+
+                if(intervalSelectedId ==2131493050)
+                {
+                    conf.changeData("interval",30);
+                    Logger.append("Sound interval changed to 30 sec");
+                }
+                if(intervalSelectedId ==2131493051)
+                {
+                    conf.changeData("interval",60);
+                    Logger.append("Sound interval changed to 60 sec");
+                }
+                if(intervalSelectedId ==2131493052)
+                {
+                    conf.changeData("interval",120);
+                    Logger.append("Sound interval changed to 120 sec");
+                }
+
+                if(DurationSelectedId ==2131493046)
+                {
+                    conf.changeData("duration","30");
+                    Logger.append("Sound duration changed to 30 sec");
+                }
+                if(DurationSelectedId ==2131493047)
+                {
+                    conf.changeData("duration","60");
+                    Logger.append("Sound duration changed to 60 sec");
+                }
+                if(DurationSelectedId ==2131493048)
+                {
+                    conf.changeData("duration","120");
+                    Logger.append("Sound duration changed to 120 sec");
+                }
+                Toast.makeText(getApplicationContext(),"Sound set to duration: "+conf.data.get("duration")+"sec, every "+conf.data.get("interval")
+                        +" sec" , Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+    }
 
 
 

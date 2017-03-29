@@ -2,57 +2,78 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/duration" />
+        android:orientation="horizontal">
 
-    <RadioGroup
-        android:id="@+id/durationGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <RadioButton
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/_30sec" />
+            android:text="@string/duration" />
 
-        <RadioButton
+        <RadioGroup
+            android:id="@+id/durationGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/sDuration30sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_30sec" />
+
+            <RadioButton
+                android:id="@+id/sDuration60sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_60sec" />
+
+            <RadioButton
+                android:id="@+id/sDuration120sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_120sec" />
+        </RadioGroup>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/_60sec" />
+            android:text="@string/interval" />
 
-        <RadioButton
+        <RadioGroup
+            android:id="@+id/soundIntervalGroup"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/_120sec" />
-    </RadioGroup>
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
+            <RadioButton
+                android:id="@+id/iDuration30sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_30sec" />
+
+            <RadioButton
+                android:id="@+id/iDuration60sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_60sec" />
+
+            <RadioButton
+                android:id="@+id/iDuration120sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_120sec" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/soundApprove"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/interval" />
+        android:text="Approve" />
 
-    <RadioGroup
-        android:id="@+id/soundIntervalGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
 
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/_30sec" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/_60sec" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/_120sec" />
-    </RadioGroup>
 </LinearLayout>

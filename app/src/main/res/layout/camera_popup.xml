@@ -2,66 +2,80 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/resolutionTV"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/resolution" />
+        android:orientation="horizontal">
 
-    <RadioGroup
-        android:id="@+id/resolutionGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <RadioButton
-            android:id="@+id/r640x480"
+        <TextView
+            android:id="@+id/resolutionTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/small" />
+            android:text="@string/resolution" />
 
-        <RadioButton
-            android:id="@+id/r800x600"
+        <RadioGroup
+            android:id="@+id/resolutionGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/r640x480"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/small" />
+
+            <RadioButton
+                android:id="@+id/r800x600"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/medium" />
+
+            <RadioButton
+                android:id="@+id/r1024x768"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/large" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/cameraIntervalTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/medium" />
+            android:text="@string/interval" />
 
-        <RadioButton
-            android:id="@+id/r1024x768"
+        <RadioGroup
+            android:id="@+id/cameraIntervalGroup"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/large" />
-    </RadioGroup>
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/cameraIntervalTextView"
-        android:layout_width="wrap_content"
+            <RadioButton
+                android:id="@+id/camera10sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_10sec" />
+
+            <RadioButton
+                android:id="@+id/camera30sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_30sec" />
+
+            <RadioButton
+                android:id="@+id/camera60sec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_60sec" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/bApprove"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/interval" />
+        android:text="Approve" />
 
-    <RadioGroup
-        android:id="@+id/cameraIntervalGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <RadioButton
-            android:id="@+id/camera10sec"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/_10sec" />
-
-        <RadioButton
-            android:id="@+id/camera30sec"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/_30sec" />
-
-        <RadioButton
-            android:id="@+id/camera60sec"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/_60sec" />
-    </RadioGroup>
 
 </LinearLayout>

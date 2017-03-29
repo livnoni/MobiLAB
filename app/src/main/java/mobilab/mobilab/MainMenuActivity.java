@@ -1,9 +1,11 @@
 package mobilab.mobilab;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +16,8 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class MainMenuActivity extends AppCompatActivity {
 
@@ -24,7 +28,7 @@ public class MainMenuActivity extends AppCompatActivity {
     class config {
         private CheckBox checkBox;
         private Boolean active;
-        private Object data[];
+        private HashMap<String, Object> data;
         private String id;
         private Boolean alertDialog = false;
 
@@ -33,8 +37,13 @@ public class MainMenuActivity extends AppCompatActivity {
             this.checkBox = cb;
             this.active = bl;
             if (dataCapacity > -1) {
-                this.data = new Object[dataCapacity];
+                this.data =  new HashMap<String, Object>();
                 alertDialog = true;
+            }
+            if(name=="camera")  //set default data for camera
+            {
+                this.data.put("interval",30);
+                this.data.put("resolution","640x480");
             }
         }
 
@@ -44,6 +53,11 @@ public class MainMenuActivity extends AppCompatActivity {
 
         public void changeState() {
             active = !active;
+        }
+
+        public void changeData(String key,Object data)
+        {
+            this.data.put(key,data);
         }
 
     }
@@ -130,44 +144,87 @@ public class MainMenuActivity extends AppCompatActivity {
      *
      * @param conf
      */
-    public void showPopup(config conf) {
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = null;
+    public void showPopup(final config conf) {
         switch (conf.id) {
             case "camera":
-                dialogView = inflater.inflate(R.layout.camera_popup, null);
+                showCameraPropertiesPopUp(conf);
                 break;
             case "sms":
-                dialogView = inflater.inflate(R.layout.sms_popup, null);
                 break;
             case "sound":
-                dialogView = inflater.inflate(R.layout.sound_popup, null);
                 break;
         }
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(dialogView);
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    }
+
+    public void showCameraPropertiesPopUp(final config conf)
+    {
+        final Dialog dialog=new Dialog(MainMenuActivity.this);
+        dialog.setContentView(R.layout.camera_popup);
+        dialog.setTitle("Camera Properties");
+        dialog.show();
+
+        Button bApprove = (Button) dialog.findViewById(R.id.bApprove);
+        final RadioGroup intervalRadioGroup = (RadioGroup) dialog.findViewById(R.id.cameraIntervalGroup);
+        final RadioGroup resolutionRadioGroup = (RadioGroup) dialog.findViewById(R.id.resolutionGroup);
+
+        //Make radio interval button clicked:
+        int lastIntervalId = getResources().getIdentifier("camera"+conf.data.get("interval")+"sec", "id", getPackageName());
+        RadioButton LastRadioButton = (RadioButton) dialog.findViewById(lastIntervalId);
+        LastRadioButton.setChecked(true);
+
+        //Make radio resolution button clicked:
+        int lastResolutionId = getResources().getIdentifier("r"+conf.data.get("resolution"), "id", getPackageName());
+        RadioButton LastResolutionButton = (RadioButton) dialog.findViewById(lastResolutionId);
+        LastResolutionButton.setChecked(true);
+
+        bApprove.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                    
-//                take data from popup
-//                RadioGroup radioGroup = (RadioGroup) findViewById(R.id.resolutionGroup);
-//                get selected radio button from radioGroup
-//                int selectedId = radioGroup.getCheckedRadioButtonId();
-//                find the radio button by returned id
-//                RadioButton radioButton = (RadioButton) findViewById(whichButton);
-//                Toast.makeText(MainMenuActivity.this, selectedId + "", Toast.LENGTH_SHORT).show();
+            public void onClick(View v)
+            {
+                int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
+                int resolutionSelectedId = resolutionRadioGroup.getCheckedRadioButtonId();
+
+                if(intervalSelectedId ==2131493000)
+                {
+                    conf.changeData("interval",10);
+                    Logger.append("Camera interval changed to 10 sec");
+                }
+                if(intervalSelectedId ==2131493001)
+                {
+                    conf.changeData("interval",30);
+                    Logger.append("Camera interval changed to 30 sec");
+                }
+                if(intervalSelectedId ==2131493002)
+                {
+                    conf.changeData("interval",60);
+                    Logger.append("Camera interval changed to 60 sec");
+                }
+
+                if(resolutionSelectedId ==2131492995)
+                {
+                    conf.changeData("resolution","640x480");
+                    Logger.append("Camera resolution changed to 640x480");
+                }
+                if(resolutionSelectedId ==2131492996)
+                {
+                    conf.changeData("resolution","800x600");
+                    Logger.append("Camera resolution changed to 800x600");
+                }
+                if(resolutionSelectedId ==2131492997)
+                {
+                    conf.changeData("resolution","1024x768");
+                    Logger.append("Camera resolution changed to 1024x768");
+                }
+                Toast.makeText(getApplicationContext(),"Camera set to: "+conf.data.get("resolution")+" and "+conf.data.get("interval")
+                       +" sec" , Toast.LENGTH_SHORT).show();
 
                 dialog.dismiss();
             }
         });
-        builder.show();
     }
+
+
+
 
     @Override
     protected void onDestroy() {

@@ -5,8 +5,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,9 +16,25 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Objects;
 
 public class MainMenuActivity extends AppCompatActivity {
+    //const
+    public static final int CAMERA_10_INTERVAL = 2131493000;
+    public static final int CAMERA_30_INTERVAL = 2131493001;
+    public static final int CAMERA_60_INTERVAL = 2131493002;
+    public static final int CAMERA_640x480_RESOLUTION = 2131492995;
+    public static final int CAMERA_800x600_RESOLUTION = 2131492996;
+    public static final int CAMERA_1024x768_RESOLUTION = 2131492997;
+    public static final int SMS_10_INTERVAL = 2131493041;
+    public static final int SMS_30_INTERVAL = 2131493042;
+    public static final int SMS_60_INTERVAL = 2131493043;
+    public static final int SOUND_10_INTERVAL = 2131493050;
+    public static final int SOUND_30_INTERVAL = 2131493051;
+    public static final int SOUND_60_INTERVAL = 2131493052;
+    public static final int SOUND_30_DURATION = 2131493046;
+    public static final int SOUND_60_DURATION = 2131493047;
+    public static final int SOUND_120_DURATION = 2131493048;
+
 
     /**
      * check box configuration object to hold configuration for each sensor
@@ -95,7 +109,7 @@ public class MainMenuActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                logger.append("this is check.");
+                logger.append("this is start button.");
             }
         });
     }
@@ -169,11 +183,16 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * define the configuration popup to show for the camera
+     *
+     * @param conf
+     */
     public void showCameraPropertiesPopUp(final config conf) {
         //TODO: implement dialog.setCanceledOnTouchOutside(); function
         final Dialog dialog = new Dialog(MainMenuActivity.this);
         dialog.setContentView(R.layout.camera_popup);
-        dialog.setTitle("Camera Properties");
+        dialog.setTitle(R.string.camera_properties);
         dialog.show();
 
         Button bApprove = (Button) dialog.findViewById(R.id.CameraApprove);
@@ -181,12 +200,12 @@ public class MainMenuActivity extends AppCompatActivity {
         final RadioGroup resolutionRadioGroup = (RadioGroup) dialog.findViewById(R.id.resolutionGroup);
 
         //Make radio interval button clicked:
-        int lastIntervalId = getResources().getIdentifier("camera" + conf.data.get("interval") + "sec", "id", getPackageName());
+        int lastIntervalId = getResources().getIdentifier("" + R.string.CAMERA + conf.data.get("interval") + "sec", "id", getPackageName());
         RadioButton LastRadioButton = (RadioButton) dialog.findViewById(lastIntervalId);
         LastRadioButton.setChecked(true);
 
         //Make radio resolution button clicked:
-        int lastResolutionId = getResources().getIdentifier("r" + conf.data.get("resolution"), "id", getPackageName());
+        int lastResolutionId = getResources().getIdentifier("r" + conf.data.get(R.string.resolution2), "id", getPackageName());
         RadioButton LastResolutionButton = (RadioButton) dialog.findViewById(lastResolutionId);
         LastResolutionButton.setChecked(true);
 
@@ -196,30 +215,30 @@ public class MainMenuActivity extends AppCompatActivity {
                 int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
                 int resolutionSelectedId = resolutionRadioGroup.getCheckedRadioButtonId();
 
-                if (intervalSelectedId == 2131493000) {
+                if (intervalSelectedId == CAMERA_10_INTERVAL) {
                     conf.changeData("interval", 10);
-                    Logger.append("Camera interval changed to 10 sec");
+                    Logger.append("Camera" + R.string.interval_changed_10);
                 }
-                if (intervalSelectedId == 2131493001) {
+                if (intervalSelectedId == CAMERA_30_INTERVAL) {
                     conf.changeData("interval", 30);
-                    Logger.append("Camera interval changed to 30 sec");
+                    Logger.append("Camera" + R.string.interval_changed_30);
                 }
-                if (intervalSelectedId == 2131493002) {
+                if (intervalSelectedId == CAMERA_60_INTERVAL) {
                     conf.changeData("interval", 60);
-                    Logger.append("Camera interval changed to 60 sec");
+                    Logger.append("Camera" + R.string.interval_changed_60);
                 }
 
-                if (resolutionSelectedId == 2131492995) {
+                if (resolutionSelectedId == CAMERA_640x480_RESOLUTION) {
                     conf.changeData("resolution", "640x480");
-                    Logger.append("Camera resolution changed to 640x480");
+                    Logger.append(R.string.resolution_changed_640 + "");
                 }
-                if (resolutionSelectedId == 2131492996) {
+                if (resolutionSelectedId == CAMERA_800x600_RESOLUTION) {
                     conf.changeData("resolution", "800x600");
-                    Logger.append("Camera resolution changed to 800x600");
+                    Logger.append(R.string.resolution_changed_800 + "");
                 }
-                if (resolutionSelectedId == 2131492997) {
+                if (resolutionSelectedId == CAMERA_1024x768_RESOLUTION) {
                     conf.changeData("resolution", "1024x768");
-                    Logger.append("Camera resolution changed to 1024x768");
+                    Logger.append(R.string.resolution_changed_1024 + "");
                 }
                 Toast.makeText(getApplicationContext(), "Camera set to: " + conf.data.get("resolution") + " and " + conf.data.get("interval")
                         + " sec", Toast.LENGTH_SHORT).show();
@@ -229,10 +248,15 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * define the configuration popup to show for the sms
+     *
+     * @param conf
+     */
     public void showSMSPropertiesPopUp(final config conf) {
         final Dialog dialog = new Dialog(MainMenuActivity.this);
         dialog.setContentView(R.layout.sms_popup);
-        dialog.setTitle("SMS Properties");
+        dialog.setTitle(R.string.sms_properties);
         dialog.show();
 
         Button bApprove = (Button) dialog.findViewById(R.id.SMSApprove);
@@ -246,8 +270,8 @@ public class MainMenuActivity extends AppCompatActivity {
         LastRadioButton.setChecked(true);
 
         //Make telephoneText show the last data:
-        String lastTelephoneVal = (String) conf.data.get("telephone");
-        if (lastTelephoneVal != "0000000000") {
+        String lastTelephoneVal = (String) conf.data.get(R.string.telNo);
+        if (lastTelephoneVal != R.string.default_tel_number + "") {
             telephoneText.setText(lastTelephoneVal, TextView.BufferType.EDITABLE);
         }
 
@@ -257,25 +281,25 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int intervalSelectedId = SMSRadioGroup.getCheckedRadioButtonId();
 
-                if (intervalSelectedId == 2131493041) {
+                if (intervalSelectedId == SMS_10_INTERVAL) {
                     conf.changeData("interval", 10);
-                    Logger.append("SMS interval changed to 10 sec");
+                    Logger.append("SMS" + R.string.interval_changed_10);
                 }
-                if (intervalSelectedId == 2131493042) {
+                if (intervalSelectedId == SMS_30_INTERVAL) {
                     conf.changeData("interval", 30);
-                    Logger.append("SMS interval changed to 30 sec");
+                    Logger.append("SMS" + R.string.interval_changed_30);
                 }
-                if (intervalSelectedId == 2131493043) {
+                if (intervalSelectedId == SMS_60_INTERVAL) {
                     conf.changeData("interval", 60);
-                    Logger.append("SMS interval changed to 60 sec");
+                    Logger.append("SMS" + R.string.interval_changed_60);
                 }
 
                 String telephoneNumber = telephoneText.getText().toString();
 
                 if (telephoneNumber.isEmpty()) {
                     AlertDialog alertDialog = new AlertDialog.Builder(MainMenuActivity.this).create();
-                    alertDialog.setTitle("Enter Phone number");
-                    alertDialog.setMessage("Please write a phone destination number for sending SMS");
+                    alertDialog.setTitle(R.string.enter_phone_number);
+                    alertDialog.setMessage(R.string.enter_phone_number_description + "");
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
@@ -285,8 +309,8 @@ public class MainMenuActivity extends AppCompatActivity {
                     alertDialog.show();
                 } else if (telephoneNumber.length() != 10) {
                     AlertDialog alertDialog = new AlertDialog.Builder(MainMenuActivity.this).create();
-                    alertDialog.setTitle("Enter Phone number");
-                    alertDialog.setMessage("Please write a valid phone number !\nfor example: 0556699919 ");
+                    alertDialog.setTitle(R.string.enter_phone_number);
+                    alertDialog.setMessage(R.string.enter_phone_number_error + "");
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
@@ -305,10 +329,15 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * define the configuration popup to show for the sound
+     *
+     * @param conf
+     */
     public void showSoundPropertiesPopUp(final config conf) {
         final Dialog dialog = new Dialog(MainMenuActivity.this);
         dialog.setContentView(R.layout.sound_popup);
-        dialog.setTitle("Sound Properties");
+        dialog.setTitle(R.string.sound_properties);
         dialog.show();
 
         Button bApprove = (Button) dialog.findViewById(R.id.soundApprove);
@@ -331,30 +360,30 @@ public class MainMenuActivity extends AppCompatActivity {
                 int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
                 int DurationSelectedId = durationRadioGroup.getCheckedRadioButtonId();
 
-                if (intervalSelectedId == 2131493050) {
+                if (intervalSelectedId == SOUND_10_INTERVAL) {
                     conf.changeData("interval", 30);
-                    Logger.append("Sound interval changed to 30 sec");
+                    Logger.append("Sound" + R.string.interval_changed_10);
                 }
-                if (intervalSelectedId == 2131493051) {
+                if (intervalSelectedId == SOUND_30_INTERVAL) {
                     conf.changeData("interval", 60);
-                    Logger.append("Sound interval changed to 60 sec");
+                    Logger.append("Sound" + R.string.interval_changed_30);
                 }
-                if (intervalSelectedId == 2131493052) {
+                if (intervalSelectedId == SOUND_60_INTERVAL) {
                     conf.changeData("interval", 120);
-                    Logger.append("Sound interval changed to 120 sec");
+                    Logger.append("Sound" + R.string.interval_changed_60);
                 }
 
-                if (DurationSelectedId == 2131493046) {
+                if (DurationSelectedId == SOUND_30_DURATION) {
                     conf.changeData("duration", "30");
-                    Logger.append("Sound duration changed to 30 sec");
+                    Logger.append("Sound" + R.string.duration_changed_30);
                 }
-                if (DurationSelectedId == 2131493047) {
+                if (DurationSelectedId == SOUND_60_DURATION) {
                     conf.changeData("duration", "60");
-                    Logger.append("Sound duration changed to 60 sec");
+                    Logger.append("Sound" + R.string.duration_changed_60);
                 }
-                if (DurationSelectedId == 2131493048) {
+                if (DurationSelectedId == SOUND_120_DURATION) {
                     conf.changeData("duration", "120");
-                    Logger.append("Sound duration changed to 120 sec");
+                    Logger.append("Sound" + R.string.duration_changed_120);
                 }
                 Toast.makeText(getApplicationContext(), "Sound set to duration: " + conf.data.get("duration") + "sec, every " + conf.data.get("interval")
                         + " sec", Toast.LENGTH_SHORT).show();

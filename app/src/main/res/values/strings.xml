@@ -24,22 +24,16 @@
     <string name="duration">  Duration:   </string>
     <string name="camera_properties">Camera Properties</string>
     <string name="sms_properties">SMS Properties</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
-    <string name="CAMERA">camera</string>
-    <string name="resolution2">resolution</string>
+    <string name="permission_rationale">Contacts permissions are needed for providing email completions.</string>
     <string name="interval_changed_10"> interval changed to 10 sec</string>
     <string name="interval_changed_30"> interval changed to 30 sec</string>
     <string name="interval_changed_60"> interval changed to 60 sec</string>
     <string name="resolution_changed_640">Camera resolution changed to 640x480</string>
     <string name="resolution_changed_800">Camera resolution changed to 800x600</string>
     <string name="resolution_changed_1024">Camera resolution changed to 1024x768</string>
-    <string name="default_tel_number">0000000000</string>
     <string name="enter_phone_number">Enter Phone number</string>
     <string name="enter_phone_number_description">Please write a phone destination number for sending SMS</string>
-    <string name="enter_phone_number_error">Please write a valid phone number !
-for example: 0556699919 </string>
+    <string name="enter_phone_number_error">Please write a valid phone number! for example: 0556699919 </string>
     <string name="sound_properties">Sound Properties</string>
     <string name="duration_changed_30"> duration changed to 30 sec</string>
     <string name="duration_changed_60"> duration changed to 60 sec</string>

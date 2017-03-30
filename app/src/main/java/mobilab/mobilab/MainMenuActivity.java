@@ -34,7 +34,14 @@ public class MainMenuActivity extends AppCompatActivity {
     public static final int SOUND_30_DURATION = 2131493046;
     public static final int SOUND_60_DURATION = 2131493047;
     public static final int SOUND_120_DURATION = 2131493048;
-
+    public static final String GPS = "gps";
+    public static final String CAMERA = "camera";
+    public static final String SMS = "sms";
+    public static final String TEMPERATURE = "temperature";
+    public static final String BATTERY = "battery";
+    public static final String SOUND = "sound";
+    public static final String BAROMETER = "barometer";
+    public static final String EXTERNAL_SENSOR = "external sensor";
 
     /**
      * check box configuration object to hold configuration for each sensor
@@ -47,7 +54,7 @@ public class MainMenuActivity extends AppCompatActivity {
         private String id;
         private Boolean alertDialog = false;
 
-        public config(CheckBox cb, Boolean bl, int dataCapacity, String name) {
+        private config(CheckBox cb, Boolean bl, int dataCapacity, String name) {
             this.id = name;
             this.checkBox = cb;
             this.active = bl;
@@ -55,17 +62,17 @@ public class MainMenuActivity extends AppCompatActivity {
                 this.data = new HashMap<String, Object>();
                 alertDialog = true;
             }
-            if (name == "camera")  //set default data for camera
+            if (name.equals(CAMERA))  //set default data for camera
             {
                 this.data.put("interval", 30);
                 this.data.put("resolution", "640x480");
             }
-            if (name == "sms")    //set default data for SMS
+            if (name.equals(SMS))    //set default data for SMS
             {
                 this.data.put("telephone", "0000000000");
                 this.data.put("interval", "30");
             }
-            if (name == "sound")    //set default data for sound
+            if (name.equals(SOUND))    //set default data for sound
             {
                 this.data.put("duration", "60");
                 this.data.put("interval", "30");
@@ -136,14 +143,14 @@ public class MainMenuActivity extends AppCompatActivity {
      * initialize all configuration objects to initial values (used only in onCreate method
      */
     public void initConfigurations() {
-        _gps = new config((CheckBox) findViewById(R.id.gpsCB), false, -1, "gps");                                      // no additional data
-        _camera = new config((CheckBox) findViewById(R.id.cameraCB), false, 2, "camera");                              // quality, interval
-        _sms = new config((CheckBox) findViewById(R.id.smsCB), false, 2, "sms");                                       // telephone number, interval
-        _temperature = new config((CheckBox) findViewById(R.id.temperatureCB), false, -1, "temperature");              // no additional data
-        _battery = new config((CheckBox) findViewById(R.id.batteryLevelCB), false, -1, "battery");                     // no additional data
-        _sound = new config((CheckBox) findViewById(R.id.soundCB), false, 2, "sound");                                 // interval, duration
-        _barometer = new config((CheckBox) findViewById(R.id.barometerCB), false, -1, "barometer");                    // no additional data
-        _externalSensors = new config((CheckBox) findViewById(R.id.ExternalSensorsCB), false, -1, "external sensor");  // no additional data
+        _gps = new config((CheckBox) findViewById(R.id.gpsCB), false, -1, GPS);                                      // no additional data
+        _camera = new config((CheckBox) findViewById(R.id.cameraCB), false, 2, CAMERA);                              // quality, interval
+        _sms = new config((CheckBox) findViewById(R.id.smsCB), false, 2, SMS);                                       // telephone number, interval
+        _temperature = new config((CheckBox) findViewById(R.id.temperatureCB), false, -1, TEMPERATURE);              // no additional data
+        _battery = new config((CheckBox) findViewById(R.id.batteryLevelCB), false, -1, BATTERY);                     // no additional data
+        _sound = new config((CheckBox) findViewById(R.id.soundCB), false, 2, SOUND);                                 // interval, duration
+        _barometer = new config((CheckBox) findViewById(R.id.barometerCB), false, -1, BAROMETER);                    // no additional data
+        _externalSensors = new config((CheckBox) findViewById(R.id.ExternalSensorsCB), false, -1, EXTERNAL_SENSOR);  // no additional data
     }
 
     /**
@@ -171,13 +178,13 @@ public class MainMenuActivity extends AppCompatActivity {
      */
     public void showPopup(final config conf) {
         switch (conf.id) {
-            case "camera":
+            case CAMERA:
                 showCameraPropertiesPopUp(conf);
                 break;
-            case "sms":
+            case SMS:
                 showSMSPropertiesPopUp(conf);
                 break;
-            case "sound":
+            case SOUND:
                 showSoundPropertiesPopUp(conf);
                 break;
         }
@@ -217,15 +224,15 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 if (intervalSelectedId == CAMERA_10_INTERVAL) {
                     conf.changeData("interval", 10);
-                    Logger.append("Camera" + R.string.interval_changed_10);
+                    Logger.append(CAMERA + R.string.interval_changed_10);
                 }
                 if (intervalSelectedId == CAMERA_30_INTERVAL) {
                     conf.changeData("interval", 30);
-                    Logger.append("Camera" + R.string.interval_changed_30);
+                    Logger.append(CAMERA + R.string.interval_changed_30);
                 }
                 if (intervalSelectedId == CAMERA_60_INTERVAL) {
                     conf.changeData("interval", 60);
-                    Logger.append("Camera" + R.string.interval_changed_60);
+                    Logger.append(CAMERA + R.string.interval_changed_60);
                 }
 
                 if (resolutionSelectedId == CAMERA_640x480_RESOLUTION) {
@@ -283,15 +290,15 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 if (intervalSelectedId == SMS_10_INTERVAL) {
                     conf.changeData("interval", 10);
-                    Logger.append("SMS" + R.string.interval_changed_10);
+                    Logger.append(SMS + R.string.interval_changed_10);
                 }
                 if (intervalSelectedId == SMS_30_INTERVAL) {
                     conf.changeData("interval", 30);
-                    Logger.append("SMS" + R.string.interval_changed_30);
+                    Logger.append(SMS + R.string.interval_changed_30);
                 }
                 if (intervalSelectedId == SMS_60_INTERVAL) {
                     conf.changeData("interval", 60);
-                    Logger.append("SMS" + R.string.interval_changed_60);
+                    Logger.append(SMS + R.string.interval_changed_60);
                 }
 
                 String telephoneNumber = telephoneText.getText().toString();
@@ -362,28 +369,28 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 if (intervalSelectedId == SOUND_10_INTERVAL) {
                     conf.changeData("interval", 30);
-                    Logger.append("Sound" + R.string.interval_changed_10);
+                    Logger.append(SOUND + R.string.interval_changed_10);
                 }
                 if (intervalSelectedId == SOUND_30_INTERVAL) {
                     conf.changeData("interval", 60);
-                    Logger.append("Sound" + R.string.interval_changed_30);
+                    Logger.append(SOUND + R.string.interval_changed_30);
                 }
                 if (intervalSelectedId == SOUND_60_INTERVAL) {
                     conf.changeData("interval", 120);
-                    Logger.append("Sound" + R.string.interval_changed_60);
+                    Logger.append(SOUND + R.string.interval_changed_60);
                 }
 
                 if (DurationSelectedId == SOUND_30_DURATION) {
                     conf.changeData("duration", "30");
-                    Logger.append("Sound" + R.string.duration_changed_30);
+                    Logger.append(SOUND + R.string.duration_changed_30);
                 }
                 if (DurationSelectedId == SOUND_60_DURATION) {
                     conf.changeData("duration", "60");
-                    Logger.append("Sound" + R.string.duration_changed_60);
+                    Logger.append(SOUND + R.string.duration_changed_60);
                 }
                 if (DurationSelectedId == SOUND_120_DURATION) {
                     conf.changeData("duration", "120");
-                    Logger.append("Sound" + R.string.duration_changed_120);
+                    Logger.append(SOUND + R.string.duration_changed_120);
                 }
                 Toast.makeText(getApplicationContext(), "Sound set to duration: " + conf.data.get("duration") + "sec, every " + conf.data.get("interval")
                         + " sec", Toast.LENGTH_SHORT).show();

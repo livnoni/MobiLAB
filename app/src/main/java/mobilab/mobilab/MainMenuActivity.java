@@ -201,10 +201,10 @@ public class MainMenuActivity extends AppCompatActivity {
      * @param conf
      */
     public void showCameraPropertiesPopUp(final config conf) {
-        //TODO: implement dialog.setCanceledOnTouchOutside(); function
         final Dialog dialog = new Dialog(MainMenuActivity.this);
         dialog.setContentView(R.layout.camera_popup);
         dialog.setTitle(R.string.camera_properties);
+        dialog.setCanceledOnTouchOutside(true);
         dialog.show();
 
         Button bApprove = (Button) dialog.findViewById(R.id.CameraApprove);
@@ -283,8 +283,6 @@ public class MainMenuActivity extends AppCompatActivity {
         if (!lastTelephoneVal.equals(DEFAULT_TEL_NUMBER)) {
             telephoneText.setText(lastTelephoneVal, TextView.BufferType.EDITABLE);
         }
-
-
         bApprove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -304,7 +302,6 @@ public class MainMenuActivity extends AppCompatActivity {
                 }
 
                 String telephoneNumber = telephoneText.getText().toString();
-
                 if (telephoneNumber.isEmpty()) {
                     AlertDialog alertDialog = new AlertDialog.Builder(MainMenuActivity.this).create();
                     alertDialog.setTitle(R.string.enter_phone_number);
@@ -331,7 +328,6 @@ public class MainMenuActivity extends AppCompatActivity {
                     conf.changeData(TELEPHONE, telephoneNumber);
                     Toast.makeText(getApplicationContext(), "SMS will set to: " + conf.data.get(TELEPHONE) + " every " + conf.data.get(INTERVAL)
                             + " sec", Toast.LENGTH_SHORT).show();
-
                     dialog.dismiss();
                 }
             }
@@ -368,7 +364,6 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
                 int DurationSelectedId = durationRadioGroup.getCheckedRadioButtonId();
-
                 if (intervalSelectedId == SOUND_10_INTERVAL) {
                     conf.changeData(INTERVAL, 30);
                     Logger.append(SOUND + R.string.interval_changed_10);
@@ -381,7 +376,6 @@ public class MainMenuActivity extends AppCompatActivity {
                     conf.changeData(INTERVAL, 120);
                     Logger.append(SOUND + R.string.interval_changed_60);
                 }
-
                 if (DurationSelectedId == SOUND_30_DURATION) {
                     conf.changeData(DURATION, "30");
                     Logger.append(SOUND + R.string.duration_changed_30);
@@ -400,7 +394,6 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         });
     }
-
 
     @Override
     protected void onDestroy() {

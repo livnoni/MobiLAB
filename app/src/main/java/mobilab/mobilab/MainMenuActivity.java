@@ -72,8 +72,8 @@ public class MainMenuActivity extends AppCompatActivity {
             this.id = name;
             this.checkBox = cb;
             this.active = bl;
+            this.data = new HashMap<String, Object>();
             if (dataCapacity > -1) {
-                this.data = new HashMap<String, Object>();
                 alertDialog = true;
             }
             if (name.equals(CAMERA)) {  //set default data for camera
@@ -139,14 +139,6 @@ public class MainMenuActivity extends AppCompatActivity {
                     intent.putExtra(BAROMETER, _barometer.getData());
                     moving_data += BAROMETER + ",";
                 }
-                if (_camera.getState()) {
-                    intent.putExtra(CAMERA, _camera.getData());
-                    moving_data += CAMERA + ",";
-                }
-                if (_sms.getState()) {
-                    intent.putExtra(SMS, _sms.getData());
-                    moving_data += SMS + ",";
-                }
                 if (_temperature.getState()) {
                     intent.putExtra(TEMPERATURE, _temperature.getData());
                     moving_data += TEMPERATURE + ",";
@@ -159,9 +151,13 @@ public class MainMenuActivity extends AppCompatActivity {
                     intent.putExtra(SOUND, _sound.getData());
                     moving_data += SOUND + ",";
                 }
-                if (_barometer.getState()) {
-                    intent.putExtra(BAROMETER, _barometer.getData());
-                    moving_data += BAROMETER + ",";
+                if (_camera.getState()) {
+                    intent.putExtra(CAMERA, _camera.getData());
+                    moving_data += CAMERA + ",";
+                }
+                if (_sms.getState()) {
+                    intent.putExtra(SMS, _sms.getData());
+                    moving_data += SMS + ",";
                 }
                 if (_externalSensors.getState()) {
                     intent.putExtra(EXTERNAL_SENSOR, _externalSensors.getData());

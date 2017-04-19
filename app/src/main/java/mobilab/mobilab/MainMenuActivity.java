@@ -78,11 +78,11 @@ public class MainMenuActivity extends AppCompatActivity {
             }
             if (name.equals(SMS)) {//set default data for SMS
                 this.data.put(TELEPHONE, DEFAULT_TEL_NUMBER);
-                this.data.put(INTERVAL, "30");
+                this.data.put(INTERVAL, 30);
             }
             if (name.equals(SOUND)) {//set default data for sound
-                this.data.put(DURATION, "60");
-                this.data.put(INTERVAL, "30");
+                this.data.put(DURATION, 60);
+                this.data.put(INTERVAL, 30);
             }
         }
 
@@ -229,27 +229,27 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 if (intervalSelectedId == CAMERA_10_INTERVAL) {
                     conf.changeData(INTERVAL, 10);
-                    Logger.append(CAMERA + R.string.interval_changed_10);
+                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_10));
                 }
                 if (intervalSelectedId == CAMERA_30_INTERVAL) {
                     conf.changeData(INTERVAL, 30);
-                    Logger.append(CAMERA + R.string.interval_changed_30);
+                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_30));
                 }
                 if (intervalSelectedId == CAMERA_60_INTERVAL) {
                     conf.changeData(INTERVAL, 60);
-                    Logger.append(CAMERA + R.string.interval_changed_60);
+                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_60));
                 }
                 if (resolutionSelectedId == CAMERA_640x480_RESOLUTION) {
                     conf.changeData(RESOLUTION, "640x480");
-                    Logger.append(R.string.resolution_changed_640 + "");
+                    Logger.append(getResources().getString(R.string.resolution_changed_640));
                 }
                 if (resolutionSelectedId == CAMERA_800x600_RESOLUTION) {
                     conf.changeData(RESOLUTION, "800x600");
-                    Logger.append(R.string.resolution_changed_800 + "");
+                    Logger.append(getResources().getString(R.string.resolution_changed_800));
                 }
                 if (resolutionSelectedId == CAMERA_1024x768_RESOLUTION) {
                     conf.changeData(RESOLUTION, "1024x768");
-                    Logger.append(R.string.resolution_changed_1024 + "");
+                    Logger.append(getResources().getString(R.string.resolution_changed_1024));
                 }
                 Toast.makeText(getApplicationContext(), "Camera set to: " + conf.data.get(RESOLUTION) + " and " + conf.data.get(INTERVAL) + " sec", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
@@ -290,22 +290,22 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 if (intervalSelectedId == SMS_10_INTERVAL) {
                     conf.changeData(INTERVAL, 10);
-                    Logger.append(SMS + R.string.interval_changed_10);
+                    Logger.append(SMS + " " + getResources().getString(R.string.interval_changed_10));
                 }
                 if (intervalSelectedId == SMS_30_INTERVAL) {
                     conf.changeData(INTERVAL, 30);
-                    Logger.append(SMS + R.string.interval_changed_30);
+                    Logger.append(SMS + " " + getResources().getString(R.string.interval_changed_30));
                 }
                 if (intervalSelectedId == SMS_60_INTERVAL) {
                     conf.changeData(INTERVAL, 60);
-                    Logger.append(SMS + R.string.interval_changed_60);
+                    Logger.append(SMS + " " + getResources().getString(R.string.interval_changed_60));
                 }
 
                 String telephoneNumber = telephoneText.getText().toString();
                 if (telephoneNumber.isEmpty()) {
                     AlertDialog alertDialog = new AlertDialog.Builder(MainMenuActivity.this).create();
                     alertDialog.setTitle(R.string.enter_phone_number);
-                    alertDialog.setMessage(R.string.enter_phone_number_description + "");
+                    alertDialog.setMessage(getResources().getString(R.string.enter_phone_number_description));
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, OK,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
@@ -316,7 +316,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 } else if (telephoneNumber.length() != 10) {
                     AlertDialog alertDialog = new AlertDialog.Builder(MainMenuActivity.this).create();
                     alertDialog.setTitle(R.string.enter_phone_number);
-                    alertDialog.setMessage(R.string.enter_phone_number_error + "");
+                    alertDialog.setMessage(getResources().getString(R.string.enter_phone_number_error));
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, OK,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
@@ -366,27 +366,27 @@ public class MainMenuActivity extends AppCompatActivity {
                 int DurationSelectedId = durationRadioGroup.getCheckedRadioButtonId();
                 if (intervalSelectedId == SOUND_10_INTERVAL) {
                     conf.changeData(INTERVAL, 30);
-                    Logger.append(SOUND + R.string.interval_changed_10);
+                    Logger.append(SOUND + " " + getResources().getString(R.string.interval_changed_30));
                 }
                 if (intervalSelectedId == SOUND_30_INTERVAL) {
                     conf.changeData(INTERVAL, 60);
-                    Logger.append(SOUND + R.string.interval_changed_30);
+                    Logger.append(SOUND + " " + getResources().getString(R.string.interval_changed_60));
                 }
                 if (intervalSelectedId == SOUND_60_INTERVAL) {
                     conf.changeData(INTERVAL, 120);
-                    Logger.append(SOUND + R.string.interval_changed_60);
+                    Logger.append(SOUND + " " + getResources().getString(R.string.interval_changed_120));
                 }
                 if (DurationSelectedId == SOUND_30_DURATION) {
-                    conf.changeData(DURATION, "30");
-                    Logger.append(SOUND + R.string.duration_changed_30);
+                    conf.changeData(DURATION, 30);
+                    Logger.append(SOUND + " " + getResources().getString(R.string.duration_changed_30));
                 }
                 if (DurationSelectedId == SOUND_60_DURATION) {
-                    conf.changeData(DURATION, "60");
-                    Logger.append(SOUND + R.string.duration_changed_60);
+                    conf.changeData(DURATION, 60);
+                    Logger.append(SOUND + " " + getResources().getString(R.string.duration_changed_60));
                 }
                 if (DurationSelectedId == SOUND_120_DURATION) {
-                    conf.changeData(DURATION, "120");
-                    Logger.append(SOUND + R.string.duration_changed_120);
+                    conf.changeData(DURATION, 120);
+                    Logger.append(SOUND + " " + getResources().getString(R.string.duration_changed_120));
                 }
                 Toast.makeText(getApplicationContext(), "Sound set to duration: " + conf.data.get(DURATION) + "sec, every " + conf.data.get(INTERVAL)
                         + " sec", Toast.LENGTH_SHORT).show();

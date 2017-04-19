@@ -28,6 +28,7 @@
     <string name="interval_changed_10"> interval changed to 10 sec</string>
     <string name="interval_changed_30"> interval changed to 30 sec</string>
     <string name="interval_changed_60"> interval changed to 60 sec</string>
+    <string name="interval_changed_120"> interval changed to 120 sec</string>
     <string name="resolution_changed_640">Camera resolution changed to 640x480</string>
     <string name="resolution_changed_800">Camera resolution changed to 800x600</string>
     <string name="resolution_changed_1024">Camera resolution changed to 1024x768</string>

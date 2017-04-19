@@ -3,6 +3,7 @@ package mobilab.mobilab;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -51,7 +52,9 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final String DURATION = "duration";
     private static final String DEFAULT_TEL_NUMBER = "0000000000";
     private static final String OK = "OK";
-    Button startButton;
+    private static final String SEND = "sent data: ";
+    private static final String START = "START";
+    private static Button startButton;
 
     /**
      * check box configuration object to hold configuration for each sensor
@@ -98,10 +101,11 @@ public class MainMenuActivity extends AppCompatActivity {
             this.data.put(key, data);
         }
 
+        public HashMap<String, Object> getData() {
+            return this.data;
+        }
     }
 
-
-    private static Logger logger;
     private config _gps, _camera, _sms, _temperature, _battery, _sound, _barometer, _externalSensors;
 
     /**
@@ -112,16 +116,59 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_menu);
+        startButton = (Button) findViewById(R.id.button);
 
         initConfigurations();
-        setAllListeners();
+        setConfigurationListeners();
+        setStartListener();
+    }
 
-        startButton = (Button) findViewById(R.id.button);
+    private void setStartListener() {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                logger.append("this is start button.");
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                String moving_data = SEND;
+                if (_gps.getState()) {
+                    intent.putExtra(GPS, _gps.getData());
+                    moving_data += GPS + ",";
+                }
+                if (_barometer.getState()) {
+                    intent.putExtra(BAROMETER, _barometer.getData());
+                    moving_data += BAROMETER + ",";
+                }
+                if (_camera.getState()) {
+                    intent.putExtra(CAMERA, _camera.getData());
+                    moving_data += CAMERA + ",";
+                }
+                if (_sms.getState()) {
+                    intent.putExtra(SMS, _sms.getData());
+                    moving_data += SMS + ",";
+                }
+                if (_temperature.getState()) {
+                    intent.putExtra(TEMPERATURE, _temperature.getData());
+                    moving_data += TEMPERATURE + ",";
+                }
+                if (_battery.getState()) {
+                    intent.putExtra(BATTERY, _battery.getData());
+                    moving_data += BATTERY + ",";
+                }
+                if (_sound.getState()) {
+                    intent.putExtra(SOUND, _sound.getData());
+                    moving_data += SOUND + ",";
+                }
+                if (_barometer.getState()) {
+                    intent.putExtra(BAROMETER, _barometer.getData());
+                    moving_data += BAROMETER + ",";
+                }
+                if (_externalSensors.getState()) {
+                    intent.putExtra(EXTERNAL_SENSOR, _externalSensors.getData());
+                    moving_data += EXTERNAL_SENSOR + ",";
+                }
+                Logger.append(moving_data);
+                startActivity(intent);
+                Logger.append(START);
             }
         });
     }
@@ -139,7 +186,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 if (conf.alertDialog && conf.getState()) {
                     showPopup(conf);
                 }
-                logger.append(conf.id + " changed --> " + conf.getState());
+                Logger.append(conf.id + " changed -> " + conf.getState());
             }
         });
     }
@@ -162,7 +209,7 @@ public class MainMenuActivity extends AppCompatActivity {
      * set onClickListeners to all configuration objects (checkboxes)
      */
 
-    public void setAllListeners() {
+    public void setConfigurationListeners() {
         // set listeners
         setListener(_gps);
         setListener(_barometer);
@@ -399,7 +446,7 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         try {
-            logger.onDestroy();
+            Logger.onDestroy();
         } catch (IOException e) {
             e.printStackTrace();
         }

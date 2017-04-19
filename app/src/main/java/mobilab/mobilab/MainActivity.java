@@ -1,5 +1,6 @@
 package mobilab.mobilab;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -25,8 +26,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Logger.append("THIS IS TEST " + getIntent().getStringExtra("EXTRA_SESSION_ID"));
-        //String s = getIntent().getStringExtra(GPS);
+        Intent intent = getIntent();
+        Logger.append("THIS IS TEST " + intent.getSerializableExtra(GPS));
+
+        HashMap<String, Object> tmp = null;
+        if ((intent.getSerializableExtra(GPS)) != null) {
+            //_gps = new HashMap<>(tmp);
+            Logger.append("GOT\t" + tmp.toString());
+        }
 
     }
 }

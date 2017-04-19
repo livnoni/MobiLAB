@@ -20,19 +20,20 @@ public class MainActivity extends AppCompatActivity {
     private static final String INTERVAL = "interval";
     private static final String TELEPHONE = "telephone";
 
-    private HashMap<String, Object> _gps, _camera, _sms, _temperature, _battery, _sound, _barometer, _externalSensors;
+    private HashMap<String, Object> _camera, _sms, _sound;
+    private Boolean _barometer, _externalSensors_temperature, _battery, _gps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
-        Logger.append("THIS IS TEST " + intent.getSerializableExtra(GPS));
+        //Logger.append("THIS IS TEST " + intent.getSerializableExtra(GPS));
 
         HashMap<String, Object> tmp = null;
         if ((intent.getSerializableExtra(GPS)) != null) {
             //_gps = new HashMap<>(tmp);
-            Logger.append("GOT\t" + tmp.toString());
+          //  Logger.append("GOT\t" + tmp.toString());
         }
 
     }

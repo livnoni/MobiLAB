@@ -23,21 +23,21 @@ public class MainMenuActivity extends AppCompatActivity {
     /**
      * constants
      */
-    private static final int CAMERA_10_INTERVAL = 2131493000;
-    private static final int CAMERA_30_INTERVAL = 2131493001;
-    private static final int CAMERA_60_INTERVAL = 2131493002;
-    private static final int CAMERA_640x480_RESOLUTION = 2131492995;
-    private static final int CAMERA_800x600_RESOLUTION = 2131492996;
-    private static final int CAMERA_1024x768_RESOLUTION = 2131492997;
-    private static final int SMS_10_INTERVAL = 2131493041;
-    private static final int SMS_30_INTERVAL = 2131493042;
-    private static final int SMS_60_INTERVAL = 2131493043;
-    private static final int SOUND_10_INTERVAL = 2131493050;
-    private static final int SOUND_30_INTERVAL = 2131493051;
-    private static final int SOUND_60_INTERVAL = 2131493052;
-    private static final int SOUND_30_DURATION = 2131493046;
-    private static final int SOUND_60_DURATION = 2131493047;
-    private static final int SOUND_120_DURATION = 2131493048;
+    private static final int CAMERA_10_INTERVAL = 2131493009;
+    private static final int CAMERA_30_INTERVAL = 2131493010;
+    private static final int CAMERA_60_INTERVAL = 2131493011;
+    private static final int CAMERA_640x480_RESOLUTION = 2131493004;
+    private static final int CAMERA_800x600_RESOLUTION = 2131493005;
+    private static final int CAMERA_1024x768_RESOLUTION = 2131493006;
+    private static final int SMS_10_INTERVAL = 2131493050;
+    private static final int SMS_30_INTERVAL = 2131493051;
+    private static final int SMS_60_INTERVAL = 2131493052;
+    private static final int SOUND_30_INTERVAL = 2131493059;
+    private static final int SOUND_60_INTERVAL = 2131493060;
+    private static final int SOUND_120_INTERVAL = 2131493061;
+    private static final int SOUND_30_DURATION = 2131493055;
+    private static final int SOUND_60_DURATION = 2131493056;
+    private static final int SOUND_120_DURATION = 2131493057;
     private static final String GPS = "gps";
     private static final String CAMERA = "camera";
     private static final String SMS = "sms";
@@ -408,15 +408,19 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
                 int DurationSelectedId = durationRadioGroup.getCheckedRadioButtonId();
-                if (intervalSelectedId == SOUND_10_INTERVAL) {
+
+                Logger.append("intervalSelectedId= "+intervalSelectedId);
+                Logger.append("DurationSelectedId= "+DurationSelectedId);
+
+                if (intervalSelectedId == SOUND_30_INTERVAL) {
                     conf.changeData(INTERVAL, 30);
                     Logger.append(SOUND + " " + getResources().getString(R.string.interval_changed_30));
                 }
-                if (intervalSelectedId == SOUND_30_INTERVAL) {
+                if (intervalSelectedId == SOUND_60_INTERVAL) {
                     conf.changeData(INTERVAL, 60);
                     Logger.append(SOUND + " " + getResources().getString(R.string.interval_changed_60));
                 }
-                if (intervalSelectedId == SOUND_60_INTERVAL) {
+                if (intervalSelectedId == SOUND_120_INTERVAL) {
                     conf.changeData(INTERVAL, 120);
                     Logger.append(SOUND + " " + getResources().getString(R.string.interval_changed_120));
                 }

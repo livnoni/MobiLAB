@@ -2,6 +2,7 @@ package mobilab.mobilab;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Camera;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -27,10 +29,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String EXTERNAL_SENSOR = "external sensor";
     private static final String RECEIVE = "receive data: ";
     private static final String LOCATION = "location: ";
+    private static final String INTERVAL = "interval";
+    private static final String RESOLUTION = "resolution";
+
+
 
     private HashMap<String, Object> _camera, _sms, _sound;
     private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false;
-
 
     //GPS:
     private LocationManager locationManager;
@@ -50,11 +55,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initSensors() {
-        initGPS(_gps);
+        initGPS();
+        initCAMERA();
     }
 
-    private void initGPS(Boolean state) {
-        if (state) {
+    private void initCAMERA() {
+        if (_camera != null) {
+            Toast.makeText(getApplicationContext(), "_camera != null", Toast.LENGTH_SHORT).show();
+            int cameraInerval =  Integer.parseInt(_camera.get(INTERVAL).toString());
+            String cameraResolution = _camera.get(RESOLUTION).toString();
+
+            //Logger.append("values:"+cameraInerval+"   " +cameraResolution);
+
+
+        }
+    }
+
+    private void initGPS() {
+        if (_gps) {
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             locationListener = new LocationListener() {
                 @Override

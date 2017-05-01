@@ -2,20 +2,32 @@ package mobilab.mobilab;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Camera;
+import android.graphics.Bitmap;
+import android.hardware.Camera;
+import android.hardware.Camera.PictureCallback;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     // sensors
@@ -45,14 +57,51 @@ public class MainActivity extends AppCompatActivity {
     private double altitude = 0, latitude = 0, longitude = 0;
     private TextView locationText;
 
+    //Camera:
+
+    private Camera mCamera;
+    private CameraPreview mCameraPreview;
+    private int PICtimeOut = 30000; // 30 sec
+    private int widthResulution = 640; //default
+    private int heightResulution = 480; //default
+    //private int compressQuality = 10;    //3-100, 80 gives pic on 4 kb, its the best compress without loose high quality
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         locationText = (TextView) (findViewById(R.id.locationText));
+
+
+//        mCamera = getCameraInstance();
+//        mCameraPreview = new CameraPreview(this, mCamera);
+//        final FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreviwe);
+//        preview.addView(mCameraPreview);
+
         incomingIntentData();
         initSensors();
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Helper method to access the camera returns null if it cannot get the
+     * camera or does not exist
+     *
+     * @return
+     */
+    private android.hardware.Camera getCameraInstance() {
+        android.hardware.Camera camera = null;
+        try {
+            camera = android.hardware.Camera.open();
+        } catch (Exception e) {
+            // cannot get camera or does not exist
+        }
+        return camera;
+    }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void initSensors() {
         initGPS();
@@ -65,8 +114,17 @@ public class MainActivity extends AppCompatActivity {
             int cameraInerval =  Integer.parseInt(_camera.get(INTERVAL).toString());
             String cameraResolution = _camera.get(RESOLUTION).toString();
 
-            //Logger.append("values:"+cameraInerval+"   " +cameraResolution);
 
+            PICtimeOut = cameraInerval*1000; //30000 = 30 sec
+            widthResulution = Integer.parseInt(cameraResolution.split("x")[0]);
+            heightResulution = Integer.parseInt(cameraResolution.split("x")[1]);
+
+            //Logger.append("PICtimeOut"+PICtimeOut+" widthResulution= " +widthResulution+" heightResulution="+heightResulution);
+
+            mCamera = getCameraInstance();
+            mCameraPreview = new CameraPreview(this, mCamera);
+            final FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreviwe);
+            preview.addView(mCameraPreview);
 
         }
     }

@@ -2,32 +2,21 @@ package mobilab.mobilab;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.hardware.Camera;
-import android.hardware.Camera.PictureCallback;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
-import android.os.Environment;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     // sensors
@@ -43,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOCATION = "location: ";
     private static final String INTERVAL = "interval";
     private static final String RESOLUTION = "resolution";
-
 
 
     private HashMap<String, Object> _camera, _sms, _sound;
@@ -100,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void initSensors() {
@@ -111,11 +98,11 @@ public class MainActivity extends AppCompatActivity {
     private void initCAMERA() {
         if (_camera != null) {
             Toast.makeText(getApplicationContext(), "_camera != null", Toast.LENGTH_SHORT).show();
-            int cameraInerval =  Integer.parseInt(_camera.get(INTERVAL).toString());
+            int cameraInerval = Integer.parseInt(_camera.get(INTERVAL).toString());
             String cameraResolution = _camera.get(RESOLUTION).toString();
 
 
-            PICtimeOut = cameraInerval*1000; //30000 = 30 sec
+            PICtimeOut = cameraInerval * 1000; //30000 = 30 sec
             widthResulution = Integer.parseInt(cameraResolution.split("x")[0]);
             heightResulution = Integer.parseInt(cameraResolution.split("x")[1]);
 
@@ -123,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
             mCamera = getCameraInstance();
             mCameraPreview = new CameraPreview(this, mCamera);
-            final FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreviwe);
+            final FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
             preview.addView(mCameraPreview);
 
         }

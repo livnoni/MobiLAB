@@ -409,8 +409,8 @@ public class MainMenuActivity extends AppCompatActivity {
                 int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
                 int DurationSelectedId = durationRadioGroup.getCheckedRadioButtonId();
 
-                Logger.append("intervalSelectedId= "+intervalSelectedId);
-                Logger.append("DurationSelectedId= "+DurationSelectedId);
+                Logger.append("intervalSelectedId= " + intervalSelectedId);
+                Logger.append("DurationSelectedId= " + DurationSelectedId);
 
                 if (intervalSelectedId == SOUND_30_INTERVAL) {
                     conf.changeData(INTERVAL, 30);

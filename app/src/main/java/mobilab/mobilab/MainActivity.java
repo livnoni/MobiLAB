@@ -1,22 +1,35 @@
 package mobilab.mobilab;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Environment;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     // sensors
@@ -53,18 +66,49 @@ public class MainActivity extends AppCompatActivity {
     private int widthResulution = 640; //default
     private int heightResulution = 480; //default
     //private int compressQuality = 10;    //3-100, 80 gives pic on 4 kb, its the best compress without loose high quality
+    private String picPath;
+
+
+    android.os.Handler handler = new android.os.Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            try {
+                Logger.append("take pic !");
+                mCamera.startPreview(); //important! it allow to take multi pics!
+                mCamera.takePicture(null, null, mPicture);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    };
+
+    private boolean send = false;
+
+    Runnable takePicRunnable = new Runnable() {
+        @Override
+        public void run() {
+            {
+                synchronized (this) {
+                    while (send) {
+                        try {
+                            wait(PICtimeOut);
+                            handler.sendEmptyMessage(0);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         locationText = (TextView) (findViewById(R.id.locationText));
-
-
-//        mCamera = getCameraInstance();
-//        mCameraPreview = new CameraPreview(this, mCamera);
-//        final FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreviwe);
-//        preview.addView(mCameraPreview);
 
         incomingIntentData();
         initSensors();
@@ -87,6 +131,52 @@ public class MainActivity extends AppCompatActivity {
         return camera;
     }
 
+    Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            File pictureFile = getOutputMediaFile();
+            if (pictureFile == null) {
+                return;
+            }
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                fos.write(data);
+                fos.close();
+                //Upload to server:
+                //UpdateNewBitMap(pictureFile.getPath());
+                //uploadImage();
+
+            } catch (FileNotFoundException e) {
+
+            } catch (IOException e) {
+            }
+        }
+    };
+
+    private File getOutputMediaFile() {
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory("MobiLAB"), "Pictures");
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Logger.append("failed to create directory for saving pictures!");
+                return null;
+            }
+        }
+        // Create a media file name
+
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                + getNewPicName());
+        Toast.makeText(getApplicationContext(),
+                "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_LONG).show();
+        return mediaFile;
+    }
+
+    public String getNewPicName() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+        return timeStamp + "|p=" + latitude + " " + longitude + "|al=" + (int) altitude+".jpg";
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -106,12 +196,29 @@ public class MainActivity extends AppCompatActivity {
             widthResulution = Integer.parseInt(cameraResolution.split("x")[0]);
             heightResulution = Integer.parseInt(cameraResolution.split("x")[1]);
 
+
+
             //Logger.append("PICtimeOut"+PICtimeOut+" widthResulution= " +widthResulution+" heightResulution="+heightResulution);
 
             mCamera = getCameraInstance();
             mCameraPreview = new CameraPreview(this, mCamera);
             final FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
             preview.addView(mCameraPreview);
+
+
+            //We most use params after getCameraInstance().
+            Camera.Parameters params = mCamera.getParameters();
+            params.setPictureSize(widthResulution, heightResulution);
+            mCamera.setParameters(params);
+
+
+            //Start thread:
+
+            send = true;
+            Thread takePicThread = new Thread(takePicRunnable);
+            takePicThread.start();
+
+
 
         }
     }

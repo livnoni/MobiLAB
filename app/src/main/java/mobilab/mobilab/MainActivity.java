@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             try {
-                Logger.append("take pic !");
                 mCamera.startPreview(); //important! it allow to take multi pics!
                 mCamera.takePicture(null, null, mPicture);
             } catch (Exception e) {
@@ -141,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
+                Logger.append("Take pic -> "+pictureFile.getName());
                 fos.close();
                 //Upload to server:
                 //UpdateNewBitMap(pictureFile.getPath());
@@ -187,18 +187,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initCAMERA() {
         if (_camera != null) {
-            Toast.makeText(getApplicationContext(), "_camera != null", Toast.LENGTH_SHORT).show();
             int cameraInerval = Integer.parseInt(_camera.get(INTERVAL).toString());
             String cameraResolution = _camera.get(RESOLUTION).toString();
-
 
             PICtimeOut = cameraInerval * 1000; //30000 = 30 sec
             widthResulution = Integer.parseInt(cameraResolution.split("x")[0]);
             heightResulution = Integer.parseInt(cameraResolution.split("x")[1]);
-
-
-
-            //Logger.append("PICtimeOut"+PICtimeOut+" widthResulution= " +widthResulution+" heightResulution="+heightResulution);
 
             mCamera = getCameraInstance();
             mCameraPreview = new CameraPreview(this, mCamera);

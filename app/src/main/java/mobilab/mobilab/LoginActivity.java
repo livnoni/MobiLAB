@@ -20,15 +20,26 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,11 +71,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private UserLoginTask mAuthTask = null;
 
     // UI references.
+    private static int RC_SIGN_IN = 9001;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
     private Logger logger;
+    private SignInButton signInButton;
+    private Button DisconnectButton;
+    private GoogleApiClient mGoogleApiClient;
+    private GoogleSignInOptions gso;
+    private GoogleSignInAccount account;
+    private Boolean isConnected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +95,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             e.printStackTrace();
         }
 
-        // Set up the login form.
+
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
 
@@ -92,20 +110,103 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
         });
+        DisconnectButton = (Button) findViewById(R.id.sign_out_button);
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        if (isConnected) {
+            DisconnectButton.setEnabled(false);
+        } else {
+            DisconnectButton.setEnabled(true);
+        }
+
+        DisconnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                //TODO: set logic of login
-                //attemptLogin();
-                logger.append("Sign in button clicked.");
-                Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
-                startActivity(intent);
+            public void onClick(View v) {
+                signOut();
             }
         });
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        // google sing in options
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        // google api client
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Toast.makeText(getApplicationContext(), "Google API Connection Failed", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
+    }
+
+    private void signOut() {
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        if (status.isSuccess()) {
+                            isConnected = false;
+                            Toast.makeText(getApplicationContext(), "Sign Out Succeeded", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Sign Out Failed", Toast.LENGTH_SHORT).show();
+                        }
+                        updateUI(false);
+                    }
+                });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }
+    }
+
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d("OR", "handleSignInResult:" + result.isSuccess());
+        isConnected = result.isSuccess();
+        if (result.isSuccess()) {
+            account = result.getSignInAccount();
+            updateUI(true);
+        } else {
+            updateUI(false);
+        }
+    }
+
+    private void updateUI(boolean success) {
+        if (success) {
+            mEmailView.setText(account.getEmail());
+            mPasswordView.setText("This Is Password");
+            mPasswordView.setEnabled(true);
+            logIn();
+        } else {
+            mEmailView.setText("");
+            mPasswordView.setText("");
+            mPasswordView.setEnabled(false);
+        }
+    }
+
+    private void logIn() {
+        logger.append("Sign in button clicked.");
+        Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
+        startActivity(intent);
     }
 
     private void populateAutoComplete() {

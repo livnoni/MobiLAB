@@ -1,23 +1,19 @@
 package mobilab.mobilab;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +25,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     // sensors
@@ -62,12 +57,11 @@ public class MainActivity extends AppCompatActivity {
 
     private Camera mCamera;
     private CameraPreview mCameraPreview;
-    private int PICtimeOut = 30000; // 30 sec
-    private int widthResulution = 640; //default
-    private int heightResulution = 480; //default
+    private int PICTimeOut = 30000; // 30 sec
+    private int widthResolution = 640; //default
+    private int heightResolution = 480; //default
     //private int compressQuality = 10;    //3-100, 80 gives pic on 4 kb, its the best compress without loose high quality
     private String picPath;
-
 
     android.os.Handler handler = new android.os.Handler() {
         @Override
@@ -78,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     };
 
@@ -91,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 synchronized (this) {
                     while (send) {
                         try {
-                            wait(PICtimeOut);
+                            wait(PICTimeOut);
                             handler.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -108,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         locationText = (TextView) (findViewById(R.id.locationText));
-
         incomingIntentData();
         initSensors();
     }
@@ -125,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             camera = android.hardware.Camera.open();
         } catch (Exception e) {
-            // cannot get camera or does not exist
+            Logger.append("cannot access camera or does not exist");
         }
         return camera;
     }
@@ -140,15 +132,16 @@ public class MainActivity extends AppCompatActivity {
             try {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
-                Logger.append("Take pic -> "+pictureFile.getName());
+                Logger.append("picture taken: " + pictureFile.getName());
                 fos.close();
                 //Upload to server:
                 //UpdateNewBitMap(pictureFile.getPath());
                 //uploadImage();
 
             } catch (FileNotFoundException e) {
-
+                Logger.append("can't create picture file" + e.getStackTrace());
             } catch (IOException e) {
+                Logger.append("taking picture failed: " + e.getStackTrace());
             }
         }
     };
@@ -162,21 +155,19 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         // Create a media file name
-
         File mediaFile;
         mediaFile = new File(mediaStorageDir.getPath() + File.separator
                 + getNewPicName());
         Toast.makeText(getApplicationContext(),
                 "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_LONG).show();
+        Logger.append("created picture directory");
         return mediaFile;
     }
 
     public String getNewPicName() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-
-        return timeStamp + "|p=" + latitude + " " + longitude + "|al=" + (int) altitude+".jpg";
+        return timeStamp + "|p=" + latitude + " " + longitude + "|al=" + (int) altitude + ".jpg";
     }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -187,33 +178,27 @@ public class MainActivity extends AppCompatActivity {
 
     private void initCAMERA() {
         if (_camera != null) {
-            int cameraInerval = Integer.parseInt(_camera.get(INTERVAL).toString());
+            int cameraInterval = Integer.parseInt(_camera.get(INTERVAL).toString());
             String cameraResolution = _camera.get(RESOLUTION).toString();
 
-            PICtimeOut = cameraInerval * 1000; //30000 = 30 sec
-            widthResulution = Integer.parseInt(cameraResolution.split("x")[0]);
-            heightResulution = Integer.parseInt(cameraResolution.split("x")[1]);
+            PICTimeOut = cameraInterval * 1000; //30000 = 30 sec
+            widthResolution = Integer.parseInt(cameraResolution.split("x")[0]);
+            heightResolution = Integer.parseInt(cameraResolution.split("x")[1]);
 
             mCamera = getCameraInstance();
             mCameraPreview = new CameraPreview(this, mCamera);
             final FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
             preview.addView(mCameraPreview);
 
-
             //We most use params after getCameraInstance().
             Camera.Parameters params = mCamera.getParameters();
-            params.setPictureSize(widthResulution, heightResulution);
+            params.setPictureSize(widthResolution, heightResolution);
             mCamera.setParameters(params);
 
-
             //Start thread:
-
             send = true;
             Thread takePicThread = new Thread(takePicRunnable);
             takePicThread.start();
-
-
-
         }
     }
 

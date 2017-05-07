@@ -100,6 +100,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public void initLogger() {
         try {
             logger = new Logger();
+            Logger.append("logger started");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -110,20 +111,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private void initDisconnectButton() {
         DisconnectButton = (Button) findViewById(R.id.sign_out_button);
-
         if (isConnected) {
             DisconnectButton.setEnabled(false);
         } else {
             DisconnectButton.setEnabled(true);
         }
-
         DisconnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logOut();
             }
         });
-
     }
 
     /**
@@ -183,8 +181,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         if (status.isSuccess()) {
                             isConnected = false;
                             Toast.makeText(getApplicationContext(), "Sign Out Succeeded", Toast.LENGTH_SHORT).show();
+                            Logger.append("signed out successfully");
                         } else {
                             Toast.makeText(getApplicationContext(), "Sign Out Failed", Toast.LENGTH_SHORT).show();
+                            Logger.append("sign out failed");
                         }
                         updateUI(false);
                     }
@@ -203,6 +203,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            Logger.append("account picked");
             handleSignInResult(result);
         }
     }
@@ -213,7 +214,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * @param result
      */
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d("OR", "handleSignInResult:" + result.isSuccess());
         isConnected = result.isSuccess();
         if (result.isSuccess()) {
             account = result.getSignInAccount();
@@ -253,11 +253,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         startActivity(intent);
     }
 
-
     /**
      * auto generated functions for login activity
      */
-
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {

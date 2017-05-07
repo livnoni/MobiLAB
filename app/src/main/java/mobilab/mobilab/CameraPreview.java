@@ -15,6 +15,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     @SuppressWarnings("deprecation")
     public CameraPreview(Context context, Camera camera) {
         super(context);
+        Logger.append("camera instance started");
         this.mCamera = camera;
         this.mSurfaceHolder = this.getHolder();
         this.mSurfaceHolder.addCallback(this);
@@ -28,8 +29,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setDisplayOrientation(90);
             mCamera.startPreview();
         } catch (IOException e) {
-            // left blank for now
-
+            Logger.append("camera failed: " + e.getStackTrace());
         }
     }
 
@@ -39,6 +39,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         //this.getHolder().removeCallback(this); //added this for protect crashing
         mCamera.stopPreview();
         mCamera.release();
+        Logger.append("camera stopped");
     }
 
     @Override
@@ -50,6 +51,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.startPreview();
         } catch (Exception e) {
             // intentionally left blank for a test
+            Logger.append("surface change fail");
         }
     }
 

@@ -88,28 +88,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        initLogger();
+        initDisconnectButton();
+        initMailAndPassword();
+        initSignIn();
+    }
 
+    /**
+     * initialize logger object instance for log capturing
+     */
+    public void initLogger() {
         try {
             logger = new Logger();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
-
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
+    /**
+     * initialize disconnect button and logics
+     */
+    private void initDisconnectButton() {
         DisconnectButton = (Button) findViewById(R.id.sign_out_button);
 
         if (isConnected) {
@@ -121,26 +120,46 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         DisconnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signOut();
+                logOut();
             }
         });
 
+    }
+
+    /**
+     * initialize the email and password text views
+     */
+    public void initMailAndPassword() {
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        populateAutoComplete();
+        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                    attemptLogin();
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    /**
+     * initialize google sign in button and logics
+     */
+    public void initSignIn() {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         // google sing in options
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         // google api client
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(getApplicationContext(), "Google API Connection Failed", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+            @Override
+            public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                Toast.makeText(getApplicationContext(), "Google API Connection Failed", Toast.LENGTH_SHORT).show();
+            }
+        }).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
         signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +171,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
     }
 
-    private void signOut() {
+    /**
+     * attempt to log out, pop a message with relevant result
+     */
+    private void logOut() {
         DisconnectButton.setEnabled(false);
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
@@ -169,28 +191,45 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 });
     }
 
+    /**
+     * lunching sign in intent with google accounts data
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
     }
 
+    /**
+     * check if authentication succeeded, if does retrieve account data
+     *
+     * @param result
+     */
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d("OR", "handleSignInResult:" + result.isSuccess());
         isConnected = result.isSuccess();
         if (result.isSuccess()) {
             account = result.getSignInAccount();
+            Logger.append("new sign in: " + account.getDisplayName());
             updateUI(true);
         } else {
+            Logger.append("sign in failed");
             updateUI(false);
         }
     }
 
+    /**
+     * update the email and password UI according to the authentication
+     *
+     * @param success
+     */
     private void updateUI(boolean success) {
         if (success) {
             mEmailView.setText(account.getEmail());
@@ -204,12 +243,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    /**
+     * starts the main menu activity after verifying authentication
+     */
     private void logIn() {
         DisconnectButton.setEnabled(true);
         logger.append("Sign in button clicked.");
         Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
         startActivity(intent);
     }
+
+
+    /**
+     * auto generated functions for login activity
+     */
+
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
@@ -244,15 +292,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Callback received when a permissions request has been completed.
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_READ_CONTACTS) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 populateAutoComplete();
             }
         }
     }
-
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -306,12 +352,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 

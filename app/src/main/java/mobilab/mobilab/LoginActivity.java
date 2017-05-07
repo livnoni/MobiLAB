@@ -153,6 +153,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void signOut() {
+        DisconnectButton.setEnabled(false);
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
@@ -204,6 +205,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void logIn() {
+        DisconnectButton.setEnabled(true);
         logger.append("Sign in button clicked.");
         Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
         startActivity(intent);

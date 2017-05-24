@@ -71,6 +71,12 @@
 
     </LinearLayout>
 
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Automaticlly Upload Pic To Server?" />
+
     <Button
         android:id="@+id/CameraApprove"
         android:layout_width="match_parent"

@@ -18,17 +18,28 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     // sensors
@@ -52,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
     private HashMap<String, Object> _camera, _sms, _sound;
     private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false;
     private long dataId = 0;
+    private boolean sendDataToCloud = true;
+    private int updateCloudInterval = 5;
     //GPS:
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -78,6 +91,65 @@ public class MainActivity extends AppCompatActivity {
     private int SMSTimeOut = 30000;
 
 
+    /////////////////////////////////////////////////////////////////////////CloudUpload//////////////////////////////////////////////////////////////
+    com.android.volley.RequestQueue requestQueue;
+    String insertUrl = "http://mobilab.000webhostapp.com/telemetry/insertData.php";
+    Handler uploadHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO: change 0.0 values to actual values
+            sendToServer(dataId, latitude, longitude, altitude, current_temperature, current_battery_level, 0.0, 0.0);
+        }
+    };
+    Runnable updateCloudRunnable = new Runnable() {
+        @Override
+        public void run() {
+            {
+                synchronized (this) {
+                    while (sendDataToCloud) {
+                        try {
+                            wait(updateCloudInterval * 1000);
+                            handler.sendEmptyMessage(0);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        }
+    };
+
+    public void sendToServer(final long ID, final double latitude, final double longitude, final double altitude, final float Temperature, final float Battery, final double Barometer, final double EXT_Sensors) {
+        StringRequest request = new StringRequest(Request.Method.POST, insertUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Logger.append("SERVER: " + response.toString());
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Logger.append("SERVER: " + error.getCause());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> parameters = new HashMap<String, String>();
+                parameters.put("ID", String.valueOf(ID));
+                parameters.put("LatitudeLongitude", String.valueOf(latitude) + "," + String.valueOf(longitude));
+                parameters.put("Altitude", String.valueOf(altitude));
+                parameters.put("Temperature", String.valueOf(Temperature));
+                parameters.put("Battery", String.valueOf(Battery));
+                parameters.put("Barometer", String.valueOf(Barometer));
+                parameters.put("EXT_Sensors", String.valueOf(EXT_Sensors));
+                return parameters;
+            }
+        };
+        Logger.append("cloud updated -> ID: " + ID + ";LatitudeLongitude: " + latitude + "," + longitude + ";Altitude: " + altitude + ";Temperature: " + Temperature + ";Battery: " + Battery + ";Barometer: " + Barometer + ";EXT_Sensors: " + EXT_Sensors);
+        requestQueue.add(request);
+    }
     /////////////////////////////////////////////////////////////////////////TakePicThread/////////////////////////////////////////////////////////////////
 
     android.os.Handler handler = new android.os.Handler() {
@@ -190,6 +262,9 @@ public class MainActivity extends AppCompatActivity {
         locationText = (TextView) (findViewById(R.id.locationText));
         incomingIntentData();
         initSensors();
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+        Thread cloudThread = new Thread(updateCloudRunnable);
+        cloudThread.start();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -243,10 +318,8 @@ public class MainActivity extends AppCompatActivity {
         }
         // Create a media file name
         File mediaFile;
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                + getStringData() + ".jpg");
-        Toast.makeText(getApplicationContext(),
-                "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_LONG).show();
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + getStringData() + ".jpg");
+        Toast.makeText(getApplicationContext(), "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_LONG).show();
         Logger.append("created picture directory");
         return mediaFile;
     }
@@ -268,6 +341,7 @@ public class MainActivity extends AppCompatActivity {
         if (_externalSensors) {
             // TODO: implement
         }
+
         return msg;
     }
 
@@ -278,7 +352,6 @@ public class MainActivity extends AppCompatActivity {
         initCAMERA();
         initSMS();
         initBATTERYandTEMPERATURE();
-
     }
 
     private void initBATTERYandTEMPERATURE() {

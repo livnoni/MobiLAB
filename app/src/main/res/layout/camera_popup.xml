@@ -72,10 +72,11 @@
     </LinearLayout>
 
     <Switch
-        android:id="@+id/switch1"
+        android:id="@+id/cloudSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Automaticlly Upload Pic To Server?" />
+        android:text="Automatically Upload Pic To Server?" />
+
 
     <Button
         android:id="@+id/CameraApprove"

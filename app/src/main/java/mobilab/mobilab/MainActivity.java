@@ -1,11 +1,13 @@
 package mobilab.mobilab;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -16,7 +18,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,8 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String RESOLUTION = "resolution";
     private static final String TELEPHONE = "telephone";
     private static final String CLOUD = "cloud";
-
-
+    private static final int BAT_TEMP_INTERVAL = 120;// in sec
+    private float current_temperature;
+    private float current_battery_level;
     private HashMap<String, Object> _camera, _sms, _sound;
     private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false;
 
@@ -144,6 +146,43 @@ public class MainActivity extends AppCompatActivity {
     };
     Thread tSMS = new Thread(runnableSMS);
 
+    /////////////////////////////////////////////////////////////////////////////BATTERY and TEMPERATURE Thread//////////////////////////////
+
+    private void batteryAndTemperatureSample() {
+        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        current_temperature = ((float) batteryIntent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10);
+        // Error checking that probably isn't needed but I added just in case.
+        if (level == -1 || scale == -1) {
+            current_battery_level = 50.0f;
+        }
+        current_battery_level = ((float) level / (float) scale) * 100.0f;
+        Logger.append("current battery level -> " + current_battery_level);
+        Logger.append("current temperature -> " + current_temperature);
+    }
+
+    Runnable runnableBT = new Runnable() {
+        @Override
+        public void run() {
+            {
+                synchronized (this) {
+                    while (_battery || _temperature) {
+                        try {
+                            wait(BAT_TEMP_INTERVAL * 1000);
+                            batteryAndTemperatureSample();
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            Logger.append(e.getStackTrace().toString());
+                        }
+                    }
+
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,16 +244,32 @@ public class MainActivity extends AppCompatActivity {
         // Create a media file name
         File mediaFile;
         mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                + getNewPicName());
+                + getStringData() + ".jpg");
         Toast.makeText(getApplicationContext(),
                 "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_LONG).show();
         Logger.append("created picture directory");
         return mediaFile;
     }
 
-    public String getNewPicName() {
-        String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss").format(new Date());
-        return timeStamp + "|gps=lat:" + latitude + " long:" + longitude + " al:=" + (int) altitude + ".jpg";
+    public String getStringData() {
+        String msg = new SimpleDateFormat("dd-MM_HH:mm:ss").format(new Date());
+        if (_barometer) {
+            // TODO: implement
+        }
+        if (_battery) {
+            msg += ";BT:" + current_battery_level + "%";
+        }
+        if (_externalSensors) {
+            // TODO: implement
+        }
+        if (_temperature) {
+            msg += ";TMP:" + current_temperature + "c";
+        }
+        if (_gps) {
+            msg += ";GPS:" + latitude + "," + longitude + "," + (int) altitude;
+        }
+
+        return msg;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,12 +278,15 @@ public class MainActivity extends AppCompatActivity {
         initGPS();
         initCAMERA();
         initSMS();
-//        initBATTERY();
+        initBATTERYandTEMPERATURE();
+
     }
 
-    private void iniBATTERY() {
-        if (_battery) {
-
+    private void initBATTERYandTEMPERATURE() {
+        if (_battery || _temperature) {
+            batteryAndTemperatureSample();
+            Thread tBT = new Thread(runnableBT);
+            tBT.start();
         }
     }
 
@@ -309,15 +367,14 @@ public class MainActivity extends AppCompatActivity {
             sendSMS = true;
             Thread smsThread = new Thread(runnableSMS);
             smsThread.start();
-
         }
     }
 
     public void sendSms() {
         SmsManager smsManager = SmsManager.getDefault();
-        String SmsData = getNewPicName();
+        String SmsData = getStringData();
         smsManager.sendTextMessage(destinationNumber, null, SmsData, null, null);
-        Logger.append("SMS sent to: " + destinationNumber + "Data sent = " + SmsData);
+        Logger.append("SMS sent to: " + destinationNumber + " Data sent = " + SmsData);
         Toast.makeText(getApplicationContext(), "SMS set to: " + destinationNumber, Toast.LENGTH_SHORT).show();
     }
 

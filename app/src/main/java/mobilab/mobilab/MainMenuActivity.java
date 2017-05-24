@@ -255,6 +255,11 @@ public class MainMenuActivity extends AppCompatActivity {
         final RadioGroup intervalRadioGroup = (RadioGroup) dialog.findViewById(R.id.cameraIntervalGroup);
         final RadioGroup resolutionRadioGroup = (RadioGroup) dialog.findViewById(R.id.resolutionGroup);
 
+        final RadioButton radioButton1 = (RadioButton) dialog.findViewById(R.id.camera10sec);
+        final int or = 0;
+        radioButton1.setId(or);
+        Logger.append("this is radio button:"+radioButton1.toString());
+
         //Make radio interval button clicked:
         int lastIntervalId = getResources().getIdentifier(CAMERA + conf.data.get(INTERVAL) + "sec", ID, getPackageName());
         RadioButton LastRadioButton = (RadioButton) dialog.findViewById(lastIntervalId);
@@ -265,16 +270,31 @@ public class MainMenuActivity extends AppCompatActivity {
         RadioButton LastResolutionButton = (RadioButton) dialog.findViewById(lastResolutionId);
         LastResolutionButton.setChecked(true);
 
+
+
+
         bApprove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
                 int resolutionSelectedId = resolutionRadioGroup.getCheckedRadioButtonId();
 
-                if (intervalSelectedId == CAMERA_10_INTERVAL) {
-                    conf.changeData(INTERVAL, 10);
-                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_10));
+                Logger.append("intervalSelectedId=" + intervalSelectedId);
+                Logger.append("resolutionSelectedId=" + resolutionSelectedId);
+
+
+
+                switch (intervalSelectedId) {
+                    case or:
+                        conf.changeData(INTERVAL, 10);
+                        Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_10));
+                        break;
                 }
+
+//                if (intervalSelectedId == 0) {
+//                    conf.changeData(INTERVAL, 10);
+//                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_10));
+//                }
                 if (intervalSelectedId == CAMERA_30_INTERVAL) {
                     conf.changeData(INTERVAL, 30);
                     Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_30));

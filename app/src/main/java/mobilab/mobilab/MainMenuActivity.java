@@ -61,9 +61,12 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final String START = "START";
     private static Button startButton;
 
-    /**
-     * check box configuration object to hold configuration for each sensor
-     */
+    private static RadioButton rb10sec;
+    private static RadioButton rb30sec;
+    private static RadioButton rb60sec;
+    private static RadioButton rb640sec;
+    private static RadioButton rb800sec;
+    private static RadioButton rb1024sec;
 
     class config {
         private CheckBox checkBox;
@@ -243,13 +246,14 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-    private void initRadioButtons(Dialog dialog) {
-        final RadioButton rb10sec = (RadioButton) dialog.findViewById(R.id.camera10sec);
-        final RadioButton rb30sec = (RadioButton) dialog.findViewById(R.id.camera30sec);
-        final RadioButton rb60sec = (RadioButton) dialog.findViewById(R.id.camera60sec);
-        final RadioButton rb640sec = (RadioButton) dialog.findViewById(R.id.r640x480);
-        final RadioButton rb800sec = (RadioButton) dialog.findViewById(R.id.r800x600);
-        final RadioButton rb1024sec = (RadioButton) dialog.findViewById(R.id.r1024x768);
+    private void initRadioButtons(Dialog dialog)
+    {
+        rb10sec = (RadioButton) dialog.findViewById(R.id.camera10sec);
+        rb30sec = (RadioButton) dialog.findViewById(R.id.camera30sec);
+        rb60sec = (RadioButton) dialog.findViewById(R.id.camera60sec);
+        rb640sec = (RadioButton) dialog.findViewById(R.id.r640x480);
+        rb800sec = (RadioButton) dialog.findViewById(R.id.r800x600);
+        rb1024sec = (RadioButton) dialog.findViewById(R.id.r1024x768);
 
         rb10sec.setId(R.id.camera10sec);
         rb30sec.setId(R.id.camera30sec);
@@ -297,10 +301,6 @@ public class MainMenuActivity extends AppCompatActivity {
                 int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
                 int resolutionSelectedId = resolutionRadioGroup.getCheckedRadioButtonId();
 
-                Logger.append("intervalSelectedId=" + intervalSelectedId);
-                Logger.append("resolutionSelectedId=" + resolutionSelectedId);
-
-
                 switch (intervalSelectedId) {
                     case R.id.camera10sec:
                         conf.changeData(INTERVAL, 10);
@@ -314,6 +314,9 @@ public class MainMenuActivity extends AppCompatActivity {
                         conf.changeData(INTERVAL, 60);
                         Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_60));
                         break;
+                }
+                switch (resolutionSelectedId) {
+
                     case R.id.r640x480:
                         conf.changeData(RESOLUTION, "640x480");
                         Logger.append(getResources().getString(R.string.resolution_changed_640));
@@ -327,31 +330,6 @@ public class MainMenuActivity extends AppCompatActivity {
                         Logger.append(getResources().getString(R.string.resolution_changed_1024));
                         break;
                 }
-
-//                if (intervalSelectedId == 0) {
-//                    conf.changeData(INTERVAL, 10);
-//                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_10));
-//                }
-//                if (intervalSelectedId == CAMERA_30_INTERVAL) {
-//                    conf.changeData(INTERVAL, 30);
-//                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_30));
-//                }
-//                if (intervalSelectedId == CAMERA_60_INTERVAL) {
-//                    conf.changeData(INTERVAL, 60);
-//                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_60));
-//                }
-//                if (resolutionSelectedId == CAMERA_640x480_RESOLUTION) {
-//                    conf.changeData(RESOLUTION, "640x480");
-//                    Logger.append(getResources().getString(R.string.resolution_changed_640));
-//                }
-//                if (resolutionSelectedId == CAMERA_800x600_RESOLUTION) {
-//                    conf.changeData(RESOLUTION, "800x600");
-//                    Logger.append(getResources().getString(R.string.resolution_changed_800));
-//                }
-//                if (resolutionSelectedId == CAMERA_1024x768_RESOLUTION) {
-//                    conf.changeData(RESOLUTION, "1024x768");
-//                    Logger.append(getResources().getString(R.string.resolution_changed_1024));
-//                }
                 Toast.makeText(getApplicationContext(), "Camera set to: " + conf.data.get(RESOLUTION) + " and " + conf.data.get(INTERVAL) + " sec", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }

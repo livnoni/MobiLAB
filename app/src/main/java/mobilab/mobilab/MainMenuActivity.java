@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +31,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final int CAMERA_640x480_RESOLUTION = R.id.r640x480;
     private static final int CAMERA_800x600_RESOLUTION = R.id.r800x600;
     private static final int CAMERA_1024x768_RESOLUTION = R.id.r1024x768;
+    private static boolean cloudSwitchState = false;
     //sms
     private static final int SMS_10_INTERVAL = R.id.sms10sec;
     private static final int SMS_30_INTERVAL = R.id.sms30sec;
@@ -44,6 +47,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private static final String GPS = "gps";
     private static final String CAMERA = "camera";
+    private static final String CLOUD = "cloud";
     private static final String SMS = "sms";
     private static final String TEMPERATURE = "temperature";
     private static final String BATTERY = "battery";
@@ -67,10 +71,11 @@ public class MainMenuActivity extends AppCompatActivity {
     private static RadioButton rbCamera640sec;
     private static RadioButton rbCamera800sec;
     private static RadioButton rbCamera1024sec;
+    private static Switch cloudSwitch;
     //sound interval radio buttons
-    private static RadioButton rbiSound10sec;
     private static RadioButton rbiSound30sec;
     private static RadioButton rbiSound60sec;
+    private static RadioButton rbiSound120sec;
     //sound duration radio buttons
     private static RadioButton rbdSound30sec;
     private static RadioButton rbdSound60sec;
@@ -98,6 +103,7 @@ public class MainMenuActivity extends AppCompatActivity {
             if (name.equals(CAMERA)) {  //set default data for camera
                 this.data.put(INTERVAL, 30);
                 this.data.put(RESOLUTION, "640x480");
+                this.data.put(CLOUD, cloudSwitchState);
             }
             if (name.equals(SMS)) {//set default data for SMS
                 this.data.put(TELEPHONE, DEFAULT_TEL_NUMBER);
@@ -302,16 +308,16 @@ public class MainMenuActivity extends AppCompatActivity {
      */
 
     private void initSoundRadioButtons(Dialog dialog) {
-        rbiSound10sec = (RadioButton) dialog.findViewById(SOUND_30_INTERVAL);
-        rbiSound30sec = (RadioButton) dialog.findViewById(SOUND_60_INTERVAL);
-        rbiSound60sec = (RadioButton) dialog.findViewById(SOUND_120_INTERVAL);
+        rbiSound30sec = (RadioButton) dialog.findViewById(SOUND_30_INTERVAL);
+        rbiSound60sec = (RadioButton) dialog.findViewById(SOUND_60_INTERVAL);
+        rbiSound120sec = (RadioButton) dialog.findViewById(SOUND_120_INTERVAL);
         rbdSound30sec = (RadioButton) dialog.findViewById(SOUND_30_DURATION);
         rbdSound60sec = (RadioButton) dialog.findViewById(SOUND_60_DURATION);
         rbdSound120sec = (RadioButton) dialog.findViewById(SOUND_120_DURATION);
 
-        rbiSound10sec.setId(SOUND_30_INTERVAL);
-        rbiSound30sec.setId(SOUND_60_INTERVAL);
-        rbiSound60sec.setId(SOUND_120_INTERVAL);
+        rbiSound30sec.setId(SOUND_30_INTERVAL);
+        rbiSound60sec.setId(SOUND_60_INTERVAL);
+        rbiSound120sec.setId(SOUND_120_INTERVAL);
         rbdSound30sec.setId(SOUND_30_DURATION);
         rbdSound60sec.setId(SOUND_60_DURATION);
         rbdSound120sec.setId(SOUND_120_DURATION);
@@ -332,6 +338,16 @@ public class MainMenuActivity extends AppCompatActivity {
         Button bApprove = (Button) dialog.findViewById(R.id.CameraApprove);
         final RadioGroup intervalRadioGroup = (RadioGroup) dialog.findViewById(R.id.cameraIntervalGroup);
         final RadioGroup resolutionRadioGroup = (RadioGroup) dialog.findViewById(R.id.resolutionGroup);
+        cloudSwitch = (Switch) dialog.findViewById(R.id.cloudSwitch);
+        cloudSwitch.setChecked(cloudSwitchState);
+        cloudSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                cloudSwitchState = isChecked;
+                Logger.append("cloud sync -> " + isChecked);
+                conf.changeData(CLOUD, isChecked);
+            }
+        });
 
         // assign id's for resolution and interval radio buttons
         initCameraRadioButtons(dialog);
@@ -382,7 +398,7 @@ public class MainMenuActivity extends AppCompatActivity {
                         Logger.append(getResources().getString(R.string.resolution_changed_1024));
                         break;
                 }
-                Toast.makeText(getApplicationContext(), "Camera set to: " + conf.data.get(RESOLUTION) + " and " + conf.data.get(INTERVAL) + " sec", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Camera set to: " + conf.data.get(RESOLUTION) + " and " + conf.data.get(INTERVAL) + " sec" + ", cloud -> " + cloudSwitchState, Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
@@ -461,8 +477,9 @@ public class MainMenuActivity extends AppCompatActivity {
                     alertDialog.show();
                 } else {
                     conf.changeData(TELEPHONE, telephoneNumber);
-                    Toast.makeText(getApplicationContext(), "SMS will set to: " + conf.data.get(TELEPHONE) + " every " + conf.data.get(INTERVAL)
-                            + " sec", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "SMS will set to: " + conf.data.get(TELEPHONE) + " every " + conf.data.get(INTERVAL) + " sec", Toast.LENGTH_SHORT).show();
+                    Logger.append("phone: " + conf.data.get(TELEPHONE) + ";\t interval: " + conf.data.get(INTERVAL));
+
                     dialog.dismiss();
                 }
             }
@@ -475,6 +492,7 @@ public class MainMenuActivity extends AppCompatActivity {
      * @param conf
      */
     public void showSoundPropertiesPopUp(final config conf) {
+
         final Dialog dialog = new Dialog(MainMenuActivity.this);
         dialog.setContentView(R.layout.sound_popup);
         dialog.setTitle(R.string.sound_properties);
@@ -502,11 +520,6 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
                 int DurationSelectedId = durationRadioGroup.getCheckedRadioButtonId();
-
-                Logger.append("intervalSelectedId= " + intervalSelectedId);
-                Logger.append("DurationSelectedId= " + DurationSelectedId);
-
-
                 switch (intervalSelectedId) {
                     case SOUND_30_INTERVAL:
                         conf.changeData(INTERVAL, 30);

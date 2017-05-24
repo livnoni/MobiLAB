@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String INTERVAL = "interval";
     private static final String RESOLUTION = "resolution";
     private static final String TELEPHONE = "telephone";
+    private static final String CLOUD = "cloud";
 
 
     private HashMap<String, Object> _camera, _sms, _sound;
@@ -64,10 +65,10 @@ public class MainActivity extends AppCompatActivity {
     private int PICTimeOut = 30000; // 30 sec
     private int widthResolution = 640; //default
     private int heightResolution = 480; //default
+
     //private int compressQuality = 10;    //3-100, 80 gives pic on 4 kb, its the best compress without loose high quality
     private String picPath;
     private boolean runPic = false;
-
 
     //Sms:
     private boolean sendSMS = false;
@@ -117,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
     Handler handlerSMS = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            Log.d("sendToSMS() ", "-------------------");
             sendSms();
         }
     };
@@ -213,8 +213,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public String getNewPicName() {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        return timeStamp + "|p=" + latitude + " " + longitude + "|al=" + (int) altitude + ".jpg";
+        String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss").format(new Date());
+        return timeStamp + "|gps=lat:" + latitude + " long:" + longitude + " al:=" + (int) altitude + ".jpg";
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +223,13 @@ public class MainActivity extends AppCompatActivity {
         initGPS();
         initCAMERA();
         initSMS();
+//        initBATTERY();
+    }
+
+    private void iniBATTERY() {
+        if (_battery) {
+
+        }
     }
 
     private void initCAMERA() {
@@ -248,6 +255,14 @@ public class MainActivity extends AppCompatActivity {
             runPic = true;
             Thread takePicThread = new Thread(takePicRunnable);
             takePicThread.start();
+
+            boolean s = Boolean.parseBoolean(_camera.get(CLOUD).toString());
+            if (s) {
+                Logger.append("cloud state " + s);
+//                initCloud();
+            } else {
+                Logger.append("cloud state " + s);
+            }
         }
     }
 
@@ -376,33 +391,18 @@ public class MainActivity extends AppCompatActivity {
         if (sendSMS) {
             sendSMS = false;
         }
+        super.onBackPressed();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Logger.append("event: onPause()");
-//        if (runPic) {
-//            runPic = false;
-//        }
-//
-//        if (sendSMS) {
-//            sendSMS = false;
-//        }
-
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         Logger.append("event: onStop()");
-//        if (runPic) {
-//            runPic = false;
-//        }
-//
-//        if (sendSMS) {
-//            sendSMS = false;
-//        }
-
     }
 }

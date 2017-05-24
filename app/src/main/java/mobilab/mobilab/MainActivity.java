@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TELEPHONE = "telephone";
 
 
-
     private HashMap<String, Object> _camera, _sms, _sound;
     private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false;
 
@@ -74,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean sendSMS = false;
     private String destinationNumber;
     private int SMSTimeOut = 30000;
-
 
 
     /////////////////////////////////////////////////////////////////////////TakePicThread/////////////////////////////////////////////////////////////////
@@ -112,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     /////////////////////////////////////////////////////////////////////////TakeSMSThread/////////////////////////////////////////////////////////////////
-
 
 
     //Background Threads:
@@ -285,15 +282,14 @@ public class MainActivity extends AppCompatActivity {
             configure_button();
         }
     }
-    private void initSMS()
-    {
-        if(_sms!=null)
-        {
+
+    private void initSMS() {
+        if (_sms != null) {
             destinationNumber = _sms.get(TELEPHONE).toString();
             int SMSInterval = Integer.parseInt(_sms.get(INTERVAL).toString());
             SMSTimeOut = SMSInterval * 1000; //1000 = 1 sec
 
-            Logger.append("got sms data! "+destinationNumber +" "+SMSTimeOut );
+            Logger.append("got sms data! " + destinationNumber + " " + SMSTimeOut);
 
             sendSMS = true;
             Thread smsThread = new Thread(runnableSMS);
@@ -301,12 +297,12 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-    public void sendSms()
-    {
+
+    public void sendSms() {
         SmsManager smsManager = SmsManager.getDefault();
         String SmsData = getNewPicName();
-        smsManager.sendTextMessage(destinationNumber, null,SmsData , null, null);
-        Logger.append("SMS sent to: "+destinationNumber + "Data sent = "+SmsData);
+        smsManager.sendTextMessage(destinationNumber, null, SmsData, null, null);
+        Logger.append("SMS sent to: " + destinationNumber + "Data sent = " + SmsData);
         Toast.makeText(getApplicationContext(), "SMS set to: " + destinationNumber, Toast.LENGTH_SHORT).show();
     }
 
@@ -372,19 +368,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop()
-    {
-        super.onStop();
-        Logger.append("MainActivity moved to onStop()");
-        if(runPic)
-        {
-            runPic =false;
+    public void onBackPressed() {
+        Logger.append("event: onBackPressed");
+        if (runPic) {
+            runPic = false;
         }
-
-        if(sendSMS)
-        {
+        if (sendSMS) {
             sendSMS = false;
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Logger.append("event: onPause()");
+//        if (runPic) {
+//            runPic = false;
+//        }
+//
+//        if (sendSMS) {
+//            sendSMS = false;
+//        }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Logger.append("event: onStop()");
+//        if (runPic) {
+//            runPic = false;
+//        }
+//
+//        if (sendSMS) {
+//            sendSMS = false;
+//        }
 
     }
 }

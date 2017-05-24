@@ -23,21 +23,25 @@ public class MainMenuActivity extends AppCompatActivity {
     /**
      * constants
      */
-    private static final int CAMERA_10_INTERVAL = 2131493009;
-    private static final int CAMERA_30_INTERVAL = 2131493010;
-    private static final int CAMERA_60_INTERVAL = 2131493011;
-    private static final int CAMERA_640x480_RESOLUTION = 2131493004;
-    private static final int CAMERA_800x600_RESOLUTION = 2131493005;
-    private static final int CAMERA_1024x768_RESOLUTION = 2131493006;
-    private static final int SMS_10_INTERVAL = 2131493050;
-    private static final int SMS_30_INTERVAL = 2131493051;
-    private static final int SMS_60_INTERVAL = 2131493052;
-    private static final int SOUND_30_INTERVAL = 2131493059;
-    private static final int SOUND_60_INTERVAL = 2131493060;
-    private static final int SOUND_120_INTERVAL = 2131493061;
-    private static final int SOUND_30_DURATION = 2131493055;
-    private static final int SOUND_60_DURATION = 2131493056;
-    private static final int SOUND_120_DURATION = 2131493057;
+    //1
+    private static final int CAMERA_10_INTERVAL = R.id.camera10sec;
+    private static final int CAMERA_30_INTERVAL = R.id.camera30sec;
+    private static final int CAMERA_60_INTERVAL = R.id.camera60sec;
+    private static final int CAMERA_640x480_RESOLUTION = R.id.r640x480;
+    private static final int CAMERA_800x600_RESOLUTION = R.id.r800x600;
+    private static final int CAMERA_1024x768_RESOLUTION = R.id.r1024x768;
+    //2
+    private static final int SMS_10_INTERVAL = 200010;
+    private static final int SMS_30_INTERVAL = 200030;
+    private static final int SMS_60_INTERVAL = 200060;
+    //3
+    private static final int SOUND_30_INTERVAL = 300030;
+    private static final int SOUND_60_INTERVAL = 300060;
+    private static final int SOUND_120_INTERVAL = 3000120;
+    //4
+    private static final int SOUND_30_DURATION = 400030;
+    private static final int SOUND_60_DURATION = 400060;
+    private static final int SOUND_120_DURATION = 4000120;
     private static final String GPS = "gps";
     private static final String CAMERA = "camera";
     private static final String SMS = "sms";
@@ -239,6 +243,24 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
+    private void initRadioButtons(Dialog dialog) {
+        final RadioButton rb10sec = (RadioButton) dialog.findViewById(R.id.camera10sec);
+        final RadioButton rb30sec = (RadioButton) dialog.findViewById(R.id.camera30sec);
+        final RadioButton rb60sec = (RadioButton) dialog.findViewById(R.id.camera60sec);
+        final RadioButton rb640sec = (RadioButton) dialog.findViewById(R.id.r640x480);
+        final RadioButton rb800sec = (RadioButton) dialog.findViewById(R.id.r800x600);
+        final RadioButton rb1024sec = (RadioButton) dialog.findViewById(R.id.r1024x768);
+
+        rb10sec.setId(R.id.camera10sec);
+        rb30sec.setId(R.id.camera30sec);
+        rb60sec.setId(R.id.camera60sec);
+        rb640sec.setId(R.id.r640x480);
+        rb800sec.setId(R.id.r800x600);
+        rb1024sec.setId(R.id.r1024x768);
+
+    }
+
+
     /**
      * define the configuration popup to show for the camera
      *
@@ -255,10 +277,8 @@ public class MainMenuActivity extends AppCompatActivity {
         final RadioGroup intervalRadioGroup = (RadioGroup) dialog.findViewById(R.id.cameraIntervalGroup);
         final RadioGroup resolutionRadioGroup = (RadioGroup) dialog.findViewById(R.id.resolutionGroup);
 
-        final RadioButton radioButton1 = (RadioButton) dialog.findViewById(R.id.camera10sec);
-        final int or = 0;
-        radioButton1.setId(or);
-        Logger.append("this is radio button:"+radioButton1.toString());
+        // assign id's for resolution and interval radio buttons
+        initRadioButtons(dialog);
 
         //Make radio interval button clicked:
         int lastIntervalId = getResources().getIdentifier(CAMERA + conf.data.get(INTERVAL) + "sec", ID, getPackageName());
@@ -271,8 +291,6 @@ public class MainMenuActivity extends AppCompatActivity {
         LastResolutionButton.setChecked(true);
 
 
-
-
         bApprove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -283,11 +301,30 @@ public class MainMenuActivity extends AppCompatActivity {
                 Logger.append("resolutionSelectedId=" + resolutionSelectedId);
 
 
-
                 switch (intervalSelectedId) {
-                    case or:
+                    case R.id.camera10sec:
                         conf.changeData(INTERVAL, 10);
                         Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_10));
+                        break;
+                    case R.id.camera30sec:
+                        conf.changeData(INTERVAL, 30);
+                        Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_30));
+                        break;
+                    case R.id.camera60sec:
+                        conf.changeData(INTERVAL, 60);
+                        Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_60));
+                        break;
+                    case R.id.r640x480:
+                        conf.changeData(RESOLUTION, "640x480");
+                        Logger.append(getResources().getString(R.string.resolution_changed_640));
+                        break;
+                    case R.id.r800x600:
+                        conf.changeData(RESOLUTION, "800x600");
+                        Logger.append(getResources().getString(R.string.resolution_changed_800));
+                        break;
+                    case R.id.r1024x768:
+                        conf.changeData(RESOLUTION, "1024x768");
+                        Logger.append(getResources().getString(R.string.resolution_changed_1024));
                         break;
                 }
 
@@ -295,26 +332,26 @@ public class MainMenuActivity extends AppCompatActivity {
 //                    conf.changeData(INTERVAL, 10);
 //                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_10));
 //                }
-                if (intervalSelectedId == CAMERA_30_INTERVAL) {
-                    conf.changeData(INTERVAL, 30);
-                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_30));
-                }
-                if (intervalSelectedId == CAMERA_60_INTERVAL) {
-                    conf.changeData(INTERVAL, 60);
-                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_60));
-                }
-                if (resolutionSelectedId == CAMERA_640x480_RESOLUTION) {
-                    conf.changeData(RESOLUTION, "640x480");
-                    Logger.append(getResources().getString(R.string.resolution_changed_640));
-                }
-                if (resolutionSelectedId == CAMERA_800x600_RESOLUTION) {
-                    conf.changeData(RESOLUTION, "800x600");
-                    Logger.append(getResources().getString(R.string.resolution_changed_800));
-                }
-                if (resolutionSelectedId == CAMERA_1024x768_RESOLUTION) {
-                    conf.changeData(RESOLUTION, "1024x768");
-                    Logger.append(getResources().getString(R.string.resolution_changed_1024));
-                }
+//                if (intervalSelectedId == CAMERA_30_INTERVAL) {
+//                    conf.changeData(INTERVAL, 30);
+//                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_30));
+//                }
+//                if (intervalSelectedId == CAMERA_60_INTERVAL) {
+//                    conf.changeData(INTERVAL, 60);
+//                    Logger.append(CAMERA + " " + getResources().getString(R.string.interval_changed_60));
+//                }
+//                if (resolutionSelectedId == CAMERA_640x480_RESOLUTION) {
+//                    conf.changeData(RESOLUTION, "640x480");
+//                    Logger.append(getResources().getString(R.string.resolution_changed_640));
+//                }
+//                if (resolutionSelectedId == CAMERA_800x600_RESOLUTION) {
+//                    conf.changeData(RESOLUTION, "800x600");
+//                    Logger.append(getResources().getString(R.string.resolution_changed_800));
+//                }
+//                if (resolutionSelectedId == CAMERA_1024x768_RESOLUTION) {
+//                    conf.changeData(RESOLUTION, "1024x768");
+//                    Logger.append(getResources().getString(R.string.resolution_changed_1024));
+//                }
                 Toast.makeText(getApplicationContext(), "Camera set to: " + conf.data.get(RESOLUTION) + " and " + conf.data.get(INTERVAL) + " sec", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }

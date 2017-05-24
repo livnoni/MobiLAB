@@ -8,12 +8,15 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOCATION = "location: ";
     private static final String INTERVAL = "interval";
     private static final String RESOLUTION = "resolution";
+    private static final String TELEPHONE = "telephone";
 
 
     private HashMap<String, Object> _camera, _sms, _sound;
@@ -62,6 +66,16 @@ public class MainActivity extends AppCompatActivity {
     private int heightResolution = 480; //default
     //private int compressQuality = 10;    //3-100, 80 gives pic on 4 kb, its the best compress without loose high quality
     private String picPath;
+    private boolean runPic = false;
+
+
+    //Sms:
+    private boolean sendSMS = false;
+    private String destinationNumber;
+    private int SMSTimeOut = 30000;
+
+
+    /////////////////////////////////////////////////////////////////////////TakePicThread/////////////////////////////////////////////////////////////////
 
     android.os.Handler handler = new android.os.Handler() {
         @Override
@@ -75,14 +89,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private boolean send = false;
 
     Runnable takePicRunnable = new Runnable() {
         @Override
         public void run() {
             {
                 synchronized (this) {
-                    while (send) {
+                    while (runPic) {
                         try {
                             wait(PICTimeOut);
                             handler.sendEmptyMessage(0);
@@ -95,6 +108,41 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    /////////////////////////////////////////////////////////////////////////TakeSMSThread/////////////////////////////////////////////////////////////////
+
+
+    //Background Threads:
+
+    Handler handlerSMS = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Log.d("sendToSMS() ", "-------------------");
+            sendSms();
+        }
+    };
+
+
+    Runnable runnableSMS = new Runnable() {
+        @Override
+        public void run() {
+            //while(true)
+            {
+                synchronized (this) {
+                    while (sendSMS) {
+                        try {
+                            wait(SMSTimeOut);
+                            handlerSMS.sendEmptyMessage(0);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        }
+    };
+    Thread tSMS = new Thread(runnableSMS);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
     private void initSensors() {
         initGPS();
         initCAMERA();
-        //initSMS();
+        initSMS();
     }
 
     private void initCAMERA() {
@@ -197,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
             mCamera.setParameters(params);
 
             //Start thread:
-            send = true;
+            runPic = true;
             Thread takePicThread = new Thread(takePicRunnable);
             takePicThread.start();
         }
@@ -233,6 +281,29 @@ public class MainActivity extends AppCompatActivity {
             };
             configure_button();
         }
+    }
+
+    private void initSMS() {
+        if (_sms != null) {
+            destinationNumber = _sms.get(TELEPHONE).toString();
+            int SMSInterval = Integer.parseInt(_sms.get(INTERVAL).toString());
+            SMSTimeOut = SMSInterval * 1000; //1000 = 1 sec
+
+            Logger.append("got sms data! " + destinationNumber + " " + SMSTimeOut);
+
+            sendSMS = true;
+            Thread smsThread = new Thread(runnableSMS);
+            smsThread.start();
+
+        }
+    }
+
+    public void sendSms() {
+        SmsManager smsManager = SmsManager.getDefault();
+        String SmsData = getNewPicName();
+        smsManager.sendTextMessage(destinationNumber, null, SmsData, null, null);
+        Logger.append("SMS sent to: " + destinationNumber + "Data sent = " + SmsData);
+        Toast.makeText(getApplicationContext(), "SMS set to: " + destinationNumber, Toast.LENGTH_SHORT).show();
     }
 
     void configure_button() {
@@ -296,4 +367,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Logger.append("event: onBackPressed");
+        if (runPic) {
+            runPic = false;
+        }
+        if (sendSMS) {
+            sendSMS = false;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Logger.append("event: onPause()");
+//        if (runPic) {
+//            runPic = false;
+//        }
+//
+//        if (sendSMS) {
+//            sendSMS = false;
+//        }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Logger.append("event: onStop()");
+//        if (runPic) {
+//            runPic = false;
+//        }
+//
+//        if (sendSMS) {
+//            sendSMS = false;
+//        }
+
+    }
 }

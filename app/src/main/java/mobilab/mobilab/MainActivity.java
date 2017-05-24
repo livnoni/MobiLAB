@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private float current_battery_level;
     private HashMap<String, Object> _camera, _sms, _sound;
     private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false;
-
+    private long dataId = 0;
     //GPS:
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -252,23 +252,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public String getStringData() {
-        String msg = new SimpleDateFormat("dd-MM_HH:mm:ss").format(new Date());
-        if (_barometer) {
-            // TODO: implement
-        }
-        if (_battery) {
-            msg += ";BT:" + current_battery_level + "%";
-        }
-        if (_externalSensors) {
-            // TODO: implement
+        String msg = "<" + dataId++ + ">" + new SimpleDateFormat("dd-MM_HH:mm:ss").format(new Date());
+        if (_gps) {
+            msg += ";GPS:" + latitude + "," + longitude + "," + (int) altitude;
         }
         if (_temperature) {
             msg += ";TMP:" + current_temperature + "c";
         }
-        if (_gps) {
-            msg += ";GPS:" + latitude + "," + longitude + "," + (int) altitude;
+        if (_battery) {
+            msg += ";BT:" + current_battery_level + "%";
         }
-
+        if (_barometer) {
+            // TODO: implement
+        }
+        if (_externalSensors) {
+            // TODO: implement
+        }
         return msg;
     }
 

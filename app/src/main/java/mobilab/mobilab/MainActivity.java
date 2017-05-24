@@ -174,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
     private void initSensors() {
         initGPS();
         initCAMERA();
+        //initSMS();
     }
 
     private void initCAMERA() {

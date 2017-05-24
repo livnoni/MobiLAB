@@ -34,13 +34,13 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final int SMS_30_INTERVAL = R.id.sms30sec;
     private static final int SMS_60_INTERVAL = R.id.sms60sec;
     //sound interval
-    private static final int SOUND_30_INTERVAL = R.id.sDuration30sec;
-    private static final int SOUND_60_INTERVAL = R.id.sDuration60sec;
-    private static final int SOUND_120_INTERVAL = R.id.sDuration120sec;
+    private static final int SOUND_30_INTERVAL = R.id.iDuration30sec;
+    private static final int SOUND_60_INTERVAL = R.id.iDuration60sec;
+    private static final int SOUND_120_INTERVAL = R.id.iDuration120sec;
     //sound duration
-    private static final int SOUND_30_DURATION = R.id.iDuration30sec;
-    private static final int SOUND_60_DURATION = R.id.iDuration60sec;
-    private static final int SOUND_120_DURATION = R.id.iDuration120sec;
+    private static final int SOUND_30_DURATION = R.id.sDuration30sec;
+    private static final int SOUND_60_DURATION = R.id.sDuration60sec;
+    private static final int SOUND_120_DURATION = R.id.sDuration120sec;
 
     private static final String GPS = "gps";
     private static final String CAMERA = "camera";
@@ -68,9 +68,9 @@ public class MainMenuActivity extends AppCompatActivity {
     private static RadioButton rbCamera800sec;
     private static RadioButton rbCamera1024sec;
     //sound interval radio buttons
-    private static RadioButton rbiSound10sec;
     private static RadioButton rbiSound30sec;
     private static RadioButton rbiSound60sec;
+    private static RadioButton rbiSound120sec;
     //sound duration radio buttons
     private static RadioButton rbdSound30sec;
     private static RadioButton rbdSound60sec;
@@ -302,16 +302,16 @@ public class MainMenuActivity extends AppCompatActivity {
      */
 
     private void initSoundRadioButtons(Dialog dialog) {
-        rbiSound10sec = (RadioButton) dialog.findViewById(SMS_10_INTERVAL);
-        rbiSound30sec = (RadioButton) dialog.findViewById(SMS_30_INTERVAL);
-        rbiSound60sec = (RadioButton) dialog.findViewById(SMS_60_INTERVAL);
+        rbiSound30sec = (RadioButton) dialog.findViewById(SOUND_30_INTERVAL);
+        rbiSound60sec = (RadioButton) dialog.findViewById(SOUND_60_INTERVAL);
+        rbiSound120sec = (RadioButton) dialog.findViewById(SOUND_120_INTERVAL);
         rbdSound30sec = (RadioButton) dialog.findViewById(SOUND_30_DURATION);
         rbdSound60sec = (RadioButton) dialog.findViewById(SOUND_60_DURATION);
         rbdSound120sec = (RadioButton) dialog.findViewById(SOUND_120_DURATION);
 
-        rbiSound10sec.setId(CAMERA_10_INTERVAL);
-        rbiSound30sec.setId(CAMERA_30_INTERVAL);
-        rbiSound60sec.setId(CAMERA_60_INTERVAL);
+        rbiSound30sec.setId(SOUND_30_INTERVAL);
+        rbiSound60sec.setId(SOUND_60_INTERVAL);
+        rbiSound120sec.setId(SOUND_120_INTERVAL);
         rbdSound30sec.setId(SOUND_30_DURATION);
         rbdSound60sec.setId(SOUND_60_DURATION);
         rbdSound120sec.setId(SOUND_120_DURATION);
@@ -461,8 +461,9 @@ public class MainMenuActivity extends AppCompatActivity {
                     alertDialog.show();
                 } else {
                     conf.changeData(TELEPHONE, telephoneNumber);
-                    Toast.makeText(getApplicationContext(), "SMS will set to: " + conf.data.get(TELEPHONE) + " every " + conf.data.get(INTERVAL)
-                            + " sec", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "SMS will set to: " + conf.data.get(TELEPHONE) + " every " + conf.data.get(INTERVAL) + " sec", Toast.LENGTH_SHORT).show();
+                    Logger.append("phone: " + conf.data.get(TELEPHONE) + ";\t interval: " + conf.data.get(INTERVAL));
+
                     dialog.dismiss();
                 }
             }
@@ -475,6 +476,7 @@ public class MainMenuActivity extends AppCompatActivity {
      * @param conf
      */
     public void showSoundPropertiesPopUp(final config conf) {
+
         final Dialog dialog = new Dialog(MainMenuActivity.this);
         dialog.setContentView(R.layout.sound_popup);
         dialog.setTitle(R.string.sound_properties);
@@ -502,11 +504,6 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int intervalSelectedId = intervalRadioGroup.getCheckedRadioButtonId();
                 int DurationSelectedId = durationRadioGroup.getCheckedRadioButtonId();
-
-                Logger.append("intervalSelectedId= " + intervalSelectedId);
-                Logger.append("DurationSelectedId= " + DurationSelectedId);
-
-
                 switch (intervalSelectedId) {
                     case SOUND_30_INTERVAL:
                         conf.changeData(INTERVAL, 30);

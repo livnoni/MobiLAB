@@ -384,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public String getStringData() {
-        String msg = "<" + dataId++ + ">" + new SimpleDateFormat("dd-MM_HH:mm:ss").format(new Date());
+        String msg = "<" + dataId + ">" + new SimpleDateFormat("dd-MM_HH:mm:ss").format(new Date());
         if (_gps) {
             msg += ";GPS:" + latitude + "," + longitude + "," + (int) altitude;
         }
@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
             msg += ";BT:" + current_battery_level + "%";
         }
         if (_barometer) {
-            // TODO: implement
+            msg += ";BAR:" + barometerData + "p";
         }
         if (_externalSensors) {
             // TODO: implement

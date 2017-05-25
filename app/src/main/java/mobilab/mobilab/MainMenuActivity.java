@@ -31,7 +31,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final int CAMERA_640x480_RESOLUTION = R.id.r640x480;
     private static final int CAMERA_800x600_RESOLUTION = R.id.r800x600;
     private static final int CAMERA_1024x768_RESOLUTION = R.id.r1024x768;
-    private static boolean cloudSwitchState = false;
+    private static boolean CameracloudSwitchState = false;
     //sms
     private static final int SMS_10_INTERVAL = R.id.sms10sec;
     private static final int SMS_30_INTERVAL = R.id.sms30sec;
@@ -64,6 +64,10 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final String SEND = "sent data: ";
     private static final String START = "START";
     private static Button startButton;
+    private static Switch automateCloudSyncSwitch;
+    private static boolean automateCloudSyncSwitchData = false;
+    private static final String CLOUD_SYNC = "cloudData";
+
     //camera radio buttons
     private static RadioButton rbCamera10sec;
     private static RadioButton rbCamera30sec;
@@ -71,7 +75,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private static RadioButton rbCamera640sec;
     private static RadioButton rbCamera800sec;
     private static RadioButton rbCamera1024sec;
-    private static Switch cloudSwitch;
+    private static Switch CameracloudSwitch;
     //sound interval radio buttons
     private static RadioButton rbiSound30sec;
     private static RadioButton rbiSound60sec;
@@ -103,7 +107,7 @@ public class MainMenuActivity extends AppCompatActivity {
             if (name.equals(CAMERA)) {  //set default data for camera
                 this.data.put(INTERVAL, 30);
                 this.data.put(RESOLUTION, "640x480");
-                this.data.put(CLOUD, cloudSwitchState);
+                this.data.put(CLOUD, CameracloudSwitchState);
             }
             if (name.equals(SMS)) {//set default data for SMS
                 this.data.put(TELEPHONE, DEFAULT_TEL_NUMBER);
@@ -144,10 +148,22 @@ public class MainMenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
         startButton = (Button) findViewById(R.id.button);
-
+        automateCloudSyncSwitch = (Switch) findViewById(R.id.CloudTelemetrySwitch);
+        setCloudSwitchListener();
         initConfigurations();
         setConfigurationListeners();
         setStartListener();
+    }
+
+    private void setCloudSwitchListener()
+    {
+        automateCloudSyncSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                automateCloudSyncSwitchData = isChecked;
+                Logger.append("cloud sync -> " + isChecked);
+            }
+        });
     }
 
     private void setStartListener() {
@@ -188,6 +204,15 @@ public class MainMenuActivity extends AppCompatActivity {
                     intent.putExtra(EXTERNAL_SENSOR, _externalSensors.getData());
                     moving_data += EXTERNAL_SENSOR + ",";
                 }
+                if (automateCloudSyncSwitchData)
+                {
+                    intent.putExtra(CLOUD_SYNC, automateCloudSyncSwitchData);
+                    moving_data += CLOUD_SYNC +".";
+                }
+
+
+
+
                 Logger.append(moving_data);
                 startActivity(intent);
                 Logger.append(START);
@@ -225,6 +250,7 @@ public class MainMenuActivity extends AppCompatActivity {
         _sound = new config((CheckBox) findViewById(R.id.soundCB), false, 2, SOUND);                                 // interval, duration
         _barometer = new config((CheckBox) findViewById(R.id.barometerCB), false, -1, BAROMETER);                    // no additional data
         _externalSensors = new config((CheckBox) findViewById(R.id.ExternalSensorsCB), false, -1, EXTERNAL_SENSOR);  // no additional data
+
     }
 
     /**
@@ -338,13 +364,13 @@ public class MainMenuActivity extends AppCompatActivity {
         Button bApprove = (Button) dialog.findViewById(R.id.CameraApprove);
         final RadioGroup intervalRadioGroup = (RadioGroup) dialog.findViewById(R.id.cameraIntervalGroup);
         final RadioGroup resolutionRadioGroup = (RadioGroup) dialog.findViewById(R.id.resolutionGroup);
-        cloudSwitch = (Switch) dialog.findViewById(R.id.cloudSwitch);
-        cloudSwitch.setChecked(cloudSwitchState);
-        cloudSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        CameracloudSwitch = (Switch) dialog.findViewById(R.id.cloudSwitch);
+        CameracloudSwitch.setChecked(CameracloudSwitchState);
+        CameracloudSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                cloudSwitchState = isChecked;
-                Logger.append("cloud sync -> " + isChecked);
+                CameracloudSwitchState = isChecked;
+                Logger.append("cloud Camera sync -> " + isChecked);
                 conf.changeData(CLOUD, isChecked);
             }
         });
@@ -398,7 +424,7 @@ public class MainMenuActivity extends AppCompatActivity {
                         Logger.append(getResources().getString(R.string.resolution_changed_1024));
                         break;
                 }
-                Toast.makeText(getApplicationContext(), "Camera set to: " + conf.data.get(RESOLUTION) + " and " + conf.data.get(INTERVAL) + " sec" + ", cloud -> " + cloudSwitchState, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Camera set to: " + conf.data.get(RESOLUTION) + " and " + conf.data.get(INTERVAL) + " sec" + ", cloud -> " + CameracloudSwitchState, Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });

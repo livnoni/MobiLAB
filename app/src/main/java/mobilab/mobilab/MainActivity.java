@@ -1,5 +1,6 @@
 package mobilab.mobilab;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -18,11 +19,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.provider.Settings.Secure;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -40,6 +43,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
     // sensors
@@ -96,13 +101,18 @@ public class MainActivity extends AppCompatActivity {
 
     /////////////////////////////////////////////////////////////////////////CloudUpload//////////////////////////////////////////////////////////////
     com.android.volley.RequestQueue requestQueue;
+    private static String AndroidId;
     String insertUrl = "http://mobilab.000webhostapp.com/telemetry/insertData.php";
+    String MODEL = Build.MANUFACTURER + " " + Build.MODEL;
+    String phoneNumber ="";
     Handler uploadHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             // TODO: change 0.0 values to actual values
+            Logger.append("phoneNumber= "+phoneNumber);
             dataId++;
-            sendToServer(dataId, latitude, longitude, altitude, current_temperature, current_battery_level, 0.0, 0.0);
+            String time = new SimpleDateFormat("dd.MM.yy--HH:mm:ss").format(new Date());
+            sendToServer(dataId, time,latitude, longitude, altitude, current_temperature, current_battery_level, 0.0, 0.0,MODEL,phoneNumber,AndroidId);
         }
     };
     Runnable updateCloudRunnable = new Runnable() {
@@ -125,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void sendToServer(final long ID, final double latitude, final double longitude, final double altitude, final float Temperature, final float Battery, final double Barometer, final double EXT_Sensors) {
+    public void sendToServer(final long ID, final String TIME ,final double latitude, final double longitude, final double altitude, final float Temperature, final float Battery, final double Barometer, final double EXT_Sensors,final String MODEL ,final String phoneNumber,final String AndroidId) {
         StringRequest request = new StringRequest(Request.Method.POST, insertUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -143,12 +153,16 @@ public class MainActivity extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> parameters = new HashMap<String, String>();
                 parameters.put("ID", String.valueOf(ID));
+                parameters.put("TIME", TIME);
                 parameters.put("LatitudeLongitude", String.valueOf(latitude) + "," + String.valueOf(longitude));
                 parameters.put("Altitude", String.valueOf(altitude));
                 parameters.put("Temperature", String.valueOf(Temperature));
                 parameters.put("Battery", String.valueOf(Battery));
                 parameters.put("Barometer", String.valueOf(Barometer));
                 parameters.put("EXT_Sensors", String.valueOf(EXT_Sensors));
+                parameters.put("MODEL", MODEL);
+                parameters.put("phoneNumber", phoneNumber);
+                parameters.put("AndroidId", AndroidId);
                 return parameters;
             }
         };
@@ -270,6 +284,19 @@ public class MainActivity extends AppCompatActivity {
         locationText = (TextView) (findViewById(R.id.locationText));
         incomingIntentData();
         initSensors();
+
+        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        AndroidId =telephonyManager.getDeviceId();
+        Logger.append("AndroidId= "+AndroidId);
+
+
+        TelephonyManager tm = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+        phoneNumber = tm.getLine1Number();
+        Logger.append("tm.getLine1Number()"+tm.getLine1Number());
+      
+
+
+
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////
 

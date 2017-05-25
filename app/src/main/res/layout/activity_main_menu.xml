@@ -72,6 +72,12 @@
             android:layout_height="wrap_content"
             android:text="External sensors" />
 
+        <Switch
+            android:id="@+id/CloudTelemetrySwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Automatically upload telemetry data to cloud" />
+
         <Button
             android:id="@+id/button"
             android:layout_width="match_parent"

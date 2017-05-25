@@ -108,8 +108,9 @@ public class MainActivity extends AppCompatActivity {
                 synchronized (this) {
                     while (sendDataToCloud) {
                         try {
-                            wait(updateCloudInterval * 1000);
-                            handler.sendEmptyMessage(0);
+                            //wait(updateCloudInterval * 1000);
+                            wait(5000);
+                            uploadHandler.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -149,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
         };
         Logger.append("cloud updated -> ID: " + ID + ";LatitudeLongitude: " + latitude + "," + longitude + ";Altitude: " + altitude + ";Temperature: " + Temperature + ";Battery: " + Battery + ";Barometer: " + Barometer + ";EXT_Sensors: " + EXT_Sensors);
         requestQueue.add(request);
+        Toast.makeText(getApplicationContext(),"Location Sent !", Toast.LENGTH_LONG).show();
+
     }
     /////////////////////////////////////////////////////////////////////////TakePicThread/////////////////////////////////////////////////////////////////
 
@@ -184,10 +187,11 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
+
+
+
     /////////////////////////////////////////////////////////////////////////TakeSMSThread/////////////////////////////////////////////////////////////////
-
-
-    //Background Threads:
 
     Handler handlerSMS = new Handler() {
         @Override
@@ -265,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(getApplicationContext());
         Thread cloudThread = new Thread(updateCloudRunnable);
         cloudThread.start();
+        //sendToServer(dataId, latitude, longitude, altitude, current_temperature, current_battery_level, 0.0, 0.0);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -389,11 +394,16 @@ public class MainActivity extends AppCompatActivity {
             boolean s = Boolean.parseBoolean(_camera.get(CLOUD).toString());
             if (s) {
                 Logger.append("cloud state " + s);
-//                initCloud();
+                initCloud();
             } else {
                 Logger.append("cloud state " + s);
             }
         }
+    }
+
+    private void initCloud()
+    {
+
     }
 
     private void initGPS() {

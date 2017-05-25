@@ -104,15 +104,14 @@ public class MainActivity extends AppCompatActivity {
     private static String AndroidId;
     String insertUrl = "http://mobilab.000webhostapp.com/telemetry/insertData.php";
     String MODEL = Build.MANUFACTURER + " " + Build.MODEL;
-    String phoneNumber ="";
+
     Handler uploadHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             // TODO: change 0.0 values to actual values
-            Logger.append("phoneNumber= "+phoneNumber);
             dataId++;
             String time = new SimpleDateFormat("dd.MM.yy--HH:mm:ss").format(new Date());
-            sendToServer(dataId, time,latitude, longitude, altitude, current_temperature, current_battery_level, 0.0, 0.0,MODEL,phoneNumber,AndroidId);
+            sendToServer(dataId, time,latitude, longitude, altitude, current_temperature, current_battery_level, 0.0, 0.0,MODEL,AndroidId);
         }
     };
     Runnable updateCloudRunnable = new Runnable() {
@@ -135,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void sendToServer(final long ID, final String TIME ,final double latitude, final double longitude, final double altitude, final float Temperature, final float Battery, final double Barometer, final double EXT_Sensors,final String MODEL ,final String phoneNumber,final String AndroidId) {
+    public void sendToServer(final long ID, final String TIME ,final double latitude, final double longitude, final double altitude, final float Temperature, final float Battery, final double Barometer, final double EXT_Sensors,final String MODEL ,final String AndroidId) {
         StringRequest request = new StringRequest(Request.Method.POST, insertUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -161,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
                 parameters.put("Barometer", String.valueOf(Barometer));
                 parameters.put("EXT_Sensors", String.valueOf(EXT_Sensors));
                 parameters.put("MODEL", MODEL);
-                parameters.put("phoneNumber", phoneNumber);
                 parameters.put("AndroidId", AndroidId);
                 return parameters;
             }
@@ -205,8 +203,61 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Helper method to access the camera returns null if it cannot get the
+     * camera or does not exist
+     *
+     * @return
+     */
+    private android.hardware.Camera getCameraInstance() {
+        android.hardware.Camera camera = null;
+        try {
+            camera = android.hardware.Camera.open();
+        } catch (Exception e) {
+            Logger.append("cannot access camera or does not exist");
+        }
+        return camera;
+    }
 
+    Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            File pictureFile = getOutputMediaFile();
+            if (pictureFile == null) {
+                return;
+            }
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                fos.write(data);
+                Logger.append("picture taken: " + pictureFile.getName());
+                fos.close();
+                //Upload to server:
+                //UpdateNewBitMap(pictureFile.getPath());
+                //uploadImage();
 
+            } catch (FileNotFoundException e) {
+                Logger.append("can't create picture file" + e.getStackTrace());
+            } catch (IOException e) {
+                Logger.append("taking picture failed: " + e.getStackTrace());
+            }
+        }
+    };
+
+    private File getOutputMediaFile() {
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory("MobiLAB"), "Pictures");
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Logger.append("failed to create directory for saving pictures!");
+                return null;
+            }
+        }
+        // Create a media file name
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + getStringData() + ".jpg");
+        Toast.makeText(getApplicationContext(), "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_LONG).show();
+        Logger.append("created picture directory");
+        return mediaFile;
+    }
 
 
     /////////////////////////////////////////////////////////////////////////TakeSMSThread/////////////////////////////////////////////////////////////////
@@ -276,7 +327,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////onCreate//////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -289,72 +342,8 @@ public class MainActivity extends AppCompatActivity {
         AndroidId =telephonyManager.getDeviceId();
         Logger.append("AndroidId= "+AndroidId);
 
-
-        TelephonyManager tm = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
-        phoneNumber = tm.getLine1Number();
-        Logger.append("tm.getLine1Number()"+tm.getLine1Number());
-      
-
-
-
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Helper method to access the camera returns null if it cannot get the
-     * camera or does not exist
-     *
-     * @return
-     */
-    private android.hardware.Camera getCameraInstance() {
-        android.hardware.Camera camera = null;
-        try {
-            camera = android.hardware.Camera.open();
-        } catch (Exception e) {
-            Logger.append("cannot access camera or does not exist");
-        }
-        return camera;
     }
 
-    Camera.PictureCallback mPicture = new Camera.PictureCallback() {
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
-            File pictureFile = getOutputMediaFile();
-            if (pictureFile == null) {
-                return;
-            }
-            try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                Logger.append("picture taken: " + pictureFile.getName());
-                fos.close();
-                //Upload to server:
-                //UpdateNewBitMap(pictureFile.getPath());
-                //uploadImage();
-
-            } catch (FileNotFoundException e) {
-                Logger.append("can't create picture file" + e.getStackTrace());
-            } catch (IOException e) {
-                Logger.append("taking picture failed: " + e.getStackTrace());
-            }
-        }
-    };
-
-    private File getOutputMediaFile() {
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory("MobiLAB"), "Pictures");
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Logger.append("failed to create directory for saving pictures!");
-                return null;
-            }
-        }
-        // Create a media file name
-        File mediaFile;
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + getStringData() + ".jpg");
-        Toast.makeText(getApplicationContext(), "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_LONG).show();
-        Logger.append("created picture directory");
-        return mediaFile;
-    }
 
     public String getStringData() {
         String msg = "<" + dataId++ + ">" + new SimpleDateFormat("dd-MM_HH:mm:ss").format(new Date());
@@ -377,7 +366,6 @@ public class MainActivity extends AppCompatActivity {
         return msg;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void initSensors() {
         initGPS();

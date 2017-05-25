@@ -1,10 +1,13 @@
 package mobilab.mobilab;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -20,12 +23,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.provider.Settings.Secure;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -98,6 +98,12 @@ public class MainActivity extends AppCompatActivity {
     private String destinationNumber;
     private int SMSTimeOut = 30000;
 
+    //Barometer
+    private boolean barometerOn = false;
+    private float barometerData;
+    private int barometerTimeOut = 10;//in sec
+
+
 
     /////////////////////////////////////////////////////////////////////////CloudUpload//////////////////////////////////////////////////////////////
     com.android.volley.RequestQueue requestQueue;
@@ -111,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             // TODO: change 0.0 values to actual values
             dataId++;
             String time = new SimpleDateFormat("dd.MM.yy--HH:mm:ss").format(new Date());
-            sendToServer(dataId, time,latitude, longitude, altitude, current_temperature, current_battery_level, 0.0, 0.0,MODEL,AndroidId);
+            sendToServer(dataId, time,latitude, longitude, altitude, current_temperature, current_battery_level,barometerData, 0.0,MODEL,AndroidId);
         }
     };
     Runnable updateCloudRunnable = new Runnable() {
@@ -289,7 +295,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-    Thread tSMS = new Thread(runnableSMS);
 
     /////////////////////////////////////////////////////////////////////////////BATTERY and TEMPERATURE Thread//////////////////////////////
 
@@ -327,6 +332,39 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    ////////////////////////////////////////////////////////////////////////////Barometric Thread////////////////////////////////////////
+    Handler HandlerBarometric = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            SensorManager sensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
+            final Sensor pS = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+            barometerData =pS.getPower();
+            Logger.append("Barometer Pressure:= "+barometerData);
+        }
+    };
+
+
+    Runnable runnableBarometric = new Runnable() {
+        @Override
+        public void run() {
+            {
+                synchronized (this) {
+                    while (barometerOn) {
+                        try {
+                            wait(barometerTimeOut *1000);
+                            HandlerBarometric.sendEmptyMessage(0);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        }
+    };
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////onCreate//////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -373,6 +411,7 @@ public class MainActivity extends AppCompatActivity {
         initSMS();
         initBATTERYandTEMPERATURE();
         initAutomateSync();
+        initBarometer();
     }
 
     private void initBATTERYandTEMPERATURE() {
@@ -496,6 +535,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void initBarometer()
+    {
+        if(_barometer!=null)
+        {
+
+            barometerOn = true;
+            Thread BarometricThread = new Thread(runnableBarometric);
+            BarometricThread.start();
+
+
+
+
+
+        }
+    }
+
     private void incomingIntentData() {
         Intent intent = getIntent();
         HashMap<String, Object> tmp = null;
@@ -564,6 +619,10 @@ public class MainActivity extends AppCompatActivity {
         if(CloudSwitchData)
         {
             CloudSwitchData=false;
+        }
+        if(barometerOn)
+        {
+            barometerOn=false;
         }
         super.onBackPressed();
     }

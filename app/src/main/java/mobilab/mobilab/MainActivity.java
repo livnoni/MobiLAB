@@ -57,13 +57,16 @@ public class MainActivity extends AppCompatActivity {
     private static final String RESOLUTION = "resolution";
     private static final String TELEPHONE = "telephone";
     private static final String CLOUD = "cloud";
+
+    private static boolean CloudSwitchData = false;
+    private static final String CLOUD_SYNC = "cloudData";
+
     private static final int BAT_TEMP_INTERVAL = 120;// in sec
     private float current_temperature;
     private float current_battery_level;
     private HashMap<String, Object> _camera, _sms, _sound;
     private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false;
     private long dataId = 0;
-    private boolean sendDataToCloud = true;
     private int updateCloudInterval = 5;
     //GPS:
     private LocationManager locationManager;
@@ -98,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             // TODO: change 0.0 values to actual values
+            dataId++;
             sendToServer(dataId, latitude, longitude, altitude, current_temperature, current_battery_level, 0.0, 0.0);
         }
     };
@@ -106,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             {
                 synchronized (this) {
-                    while (sendDataToCloud) {
+                    while (CloudSwitchData) {
                         try {
                             //wait(updateCloudInterval * 1000);
                             wait(5000);
@@ -266,10 +270,6 @@ public class MainActivity extends AppCompatActivity {
         locationText = (TextView) (findViewById(R.id.locationText));
         incomingIntentData();
         initSensors();
-        requestQueue = Volley.newRequestQueue(getApplicationContext());
-        Thread cloudThread = new Thread(updateCloudRunnable);
-        cloudThread.start();
-        //sendToServer(dataId, latitude, longitude, altitude, current_temperature, current_battery_level, 0.0, 0.0);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -357,6 +357,7 @@ public class MainActivity extends AppCompatActivity {
         initCAMERA();
         initSMS();
         initBATTERYandTEMPERATURE();
+        initAutomateSync();
     }
 
     private void initBATTERYandTEMPERATURE() {
@@ -403,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initCloud()
     {
-
+        //ToDo: implement pic upload!
     }
 
     private void initGPS() {
@@ -470,6 +471,15 @@ public class MainActivity extends AppCompatActivity {
         locationManager.requestLocationUpdates(GPS, GPS_minTime, GPS_minDistance, locationListener);
     }
 
+    public void initAutomateSync()
+    {
+        if(CloudSwitchData)
+        {
+            requestQueue = Volley.newRequestQueue(getApplicationContext());
+            Thread automateSyncDBThread = new Thread(updateCloudRunnable);
+            automateSyncDBThread.start();
+        }
+    }
 
     private void incomingIntentData() {
         Intent intent = getIntent();
@@ -507,6 +517,12 @@ public class MainActivity extends AppCompatActivity {
             _externalSensors = true;
             moving_data += EXTERNAL_SENSOR + ",";
         }
+
+        if(intent.getBooleanExtra(CLOUD_SYNC,false))
+        {
+            moving_data += CLOUD_SYNC + ".";
+            CloudSwitchData = true;
+        }
         Logger.append(moving_data);
     }
 
@@ -529,6 +545,10 @@ public class MainActivity extends AppCompatActivity {
         }
         if (sendSMS) {
             sendSMS = false;
+        }
+        if(CloudSwitchData)
+        {
+            CloudSwitchData=false;
         }
         super.onBackPressed();
     }

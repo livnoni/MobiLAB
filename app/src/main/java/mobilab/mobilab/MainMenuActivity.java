@@ -2,8 +2,14 @@ package mobilab.mobilab;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -19,6 +25,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Set;
 
 public class MainMenuActivity extends AppCompatActivity {
     /**
@@ -63,9 +70,12 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final String OK = "OK";
     private static final String SEND = "sent data: ";
     private static final String START = "START";
+    private static final String DRAGON_LINK = "DragonLink";
     private static Button startButton;
     private static Switch automateCloudSyncSwitch;
+    private static Switch DragonLinkSwitch;
     private static boolean automateCloudSyncSwitchData = false;
+    private static boolean DragonLinkSwitchData = false;
     private static final String CLOUD_SYNC = "cloudData";
 
     //camera radio buttons
@@ -88,6 +98,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private static RadioButton rbSMS10sec;
     private static RadioButton rbSMS30sec;
     private static RadioButton rbSMS60sec;
+
 
     class config {
         private CheckBox checkBox;
@@ -149,10 +160,14 @@ public class MainMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
         startButton = (Button) findViewById(R.id.button);
         automateCloudSyncSwitch = (Switch) findViewById(R.id.CloudTelemetrySwitch);
+        DragonLinkSwitch = (Switch) findViewById(R.id.DragonLinkSwitch);
         setCloudSwitchListener();
+        setDragonLinkSwitchListener();
         initConfigurations();
         setConfigurationListeners();
         setStartListener();
+
+
     }
 
     private void setCloudSwitchListener()
@@ -162,6 +177,34 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 automateCloudSyncSwitchData = isChecked;
                 Logger.append("cloud sync -> " + isChecked);
+            }
+        });
+    }
+
+    private void setDragonLinkSwitchListener()
+    {
+        DragonLinkSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(DragonLinkSwitchData == false)
+                {
+                    AlertDialog alertDialog = new AlertDialog.Builder(MainMenuActivity.this).create();
+                    alertDialog.setTitle("Usb is offline !");
+                    alertDialog.setMessage("Please Connect USB On-The-Go.");
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                    DragonLinkSwitch.setChecked(false);
+                    Logger.append("User try to clicked on DragonLinkSwitchData, but no usb have detected.!");
+                }
+                else
+                {
+                    Logger.append("DragonLinkSwitch have connect successfully!");
+                }
             }
         });
     }
@@ -207,11 +250,13 @@ public class MainMenuActivity extends AppCompatActivity {
                 if (automateCloudSyncSwitchData)
                 {
                     intent.putExtra(CLOUD_SYNC, automateCloudSyncSwitchData);
-                    moving_data += CLOUD_SYNC +".";
+                    moving_data += CLOUD_SYNC +",";
                 }
-
-
-
+                if(DragonLinkSwitch.isChecked())
+                {
+                    intent.putExtra(DRAGON_LINK,true);
+                    moving_data += DRAGON_LINK +".";
+                }
 
                 Logger.append(moving_data);
                 startActivity(intent);
@@ -590,4 +635,89 @@ public class MainMenuActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    ////////////////////////////////////////////////////DragonLink//////////////////////////////////////////////////
+
+
+
+    /*
+     * Notifications from UsbService will be received here.
+     */
+    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case UsbService.ACTION_USB_PERMISSION_GRANTED: // USB PERMISSION GRANTED
+                    Toast.makeText(context, "USB Ready", Toast.LENGTH_SHORT).show();
+                    Logger.append("USB Ready");
+                    DragonLinkSwitchData = true;
+                    break;
+                case UsbService.ACTION_USB_PERMISSION_NOT_GRANTED: // USB PERMISSION NOT GRANTED
+                    Toast.makeText(context, "USB Permission not granted", Toast.LENGTH_SHORT).show();
+                    Logger.append("USB Permission not granted");
+                    DragonLinkSwitchData = false;
+                    break;
+                case UsbService.ACTION_NO_USB: // NO USB CONNECTED
+                    Toast.makeText(context, "No USB connected", Toast.LENGTH_SHORT).show();
+                    Logger.append("No USB connected");
+                    DragonLinkSwitchData = false;
+                    break;
+                case UsbService.ACTION_USB_DISCONNECTED: // USB DISCONNECTED
+                    Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
+                    Logger.append("USB disconnected");
+                    DragonLinkSwitchData = false;
+                    break;
+                case UsbService.ACTION_USB_NOT_SUPPORTED: // USB NOT SUPPORTED
+                    Toast.makeText(context, "USB device not supported", Toast.LENGTH_SHORT).show();
+                    Logger.append("USB device not supported");
+                    DragonLinkSwitchData = false;
+                    break;
+            }
+        }
+    };
+    private UsbService usbService;
+    private final ServiceConnection usbConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName arg0, IBinder arg1) {
+            usbService = ((UsbService.UsbBinder) arg1).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            usbService = null;
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setFilters();  // Start listening notifications from UsbService
+        startService(UsbService.class, usbConnection, null); // Start UsbService(if it was not started before) and Bind it
+    }
+    private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
+        if (!UsbService.SERVICE_CONNECTED) {
+            Intent startService = new Intent(this, service);
+            if (extras != null && !extras.isEmpty()) {
+                Set<String> keys = extras.keySet();
+                for (String key : keys) {
+                    String extra = extras.getString(key);
+                    startService.putExtra(key, extra);
+                }
+            }
+            startService(startService);
+        }
+        Intent bindingIntent = new Intent(this, service);
+        bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    private void setFilters() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED);
+        filter.addAction(UsbService.ACTION_NO_USB);
+        filter.addAction(UsbService.ACTION_USB_DISCONNECTED);
+        filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED);
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED);
+        registerReceiver(mUsbReceiver, filter);
+    }
+
 }

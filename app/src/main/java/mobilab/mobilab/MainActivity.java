@@ -2,9 +2,12 @@ package mobilab.mobilab;
 
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
@@ -18,6 +21,7 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -51,6 +55,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.security.AccessController.getContext;
@@ -71,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String RESOLUTION = "resolution";
     private static final String TELEPHONE = "telephone";
     private static final String CLOUD = "cloud";
+    private static final String DRAGON_LINK = "DragonLink";
+
 
     private static boolean CloudSwitchData = false;
     private static final String CLOUD_SYNC = "cloudData";
@@ -79,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private float current_temperature;
     private float current_battery_level;
     private HashMap<String, Object> _camera, _sms, _sound;
-    private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false;
+    private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false,_dragonLink = false;
     private String dataId;
     private  String currentTime;
     private static long idCounter = 0;
@@ -190,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
         };
         Logger.append("cloud updated -> ID: " + ID + ";LatitudeLongitude: " + latitude + "," + longitude + ";Altitude: " + altitude + ";Temperature: " + Temperature + ";Battery: " + Battery + ";Barometer: " + Barometer + ";EXT_Sensors: " + EXT_Sensors);
         requestQueue.add(request);
-        Toast.makeText(getApplicationContext(),"Location Sent !", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(),"Location Sent !", Toast.LENGTH_SHORT).show();
 
     }
     /////////////////////////////////////////////////////////////////////////TakePicThread/////////////////////////////////////////////////////////////////
@@ -282,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
         // Create a media file name
         File mediaFile;
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + getStringData() + ".jpg");
-        Toast.makeText(getApplicationContext(), "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_SHORT).show();
         Logger.append("created picture directory");
         return mediaFile;
     }
@@ -309,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
                         //Disimissing the progress dialog
                         loading.dismiss();
                         //Showing toast message of the response
-                        Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
                     }
                 },
                 new Response.ErrorListener() {
@@ -319,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
                         loading.dismiss();
 
                         //Showing toast
-                        Toast.makeText(MainActivity.this, "Cant upload pic!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Cant upload pic!", Toast.LENGTH_SHORT).show();
                     }
                 }) {
             @Override
@@ -470,6 +477,40 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    ////////////////////////////////////////////////////////Dragon Link Thread //////////////////////////////////////
+    android.os.Handler DragonHandler = new android.os.Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            try {
+                if (UsbService.class != null) { // if UsbService was correctly binded, Send data
+                    UsbService.write((getStringDataShort()+"---").getBytes());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+
+    Runnable sendToDragonMsg = new Runnable() {
+        @Override
+        public void run() {
+            {
+                synchronized (this) {
+                    while (true) {
+                        try {
+                            wait(2000);
+                            DragonHandler.sendEmptyMessage(0);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        }
+    };
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////onCreate//////////////////////////////////////////////////////////////////////
@@ -508,6 +549,19 @@ public class MainActivity extends AppCompatActivity {
         if (_externalSensors) {
             // TODO: implement
         }
+        return msg;
+    }
+    public String getStringDataShort() {
+        String msg = new SimpleDateFormat("dd-MM_HH:mm:ss").format(new Date());
+        if (_gps) {
+            msg += ";GPS:" + latitude + "," + longitude + "," + (int) altitude;
+        }
+        if (_temperature) {
+            msg += ";TMP:" + current_temperature + "c";
+        }
+        if (_battery) {
+            msg += ";BT:" + current_battery_level + "%";
+        }
 
         return msg;
     }
@@ -520,6 +574,7 @@ public class MainActivity extends AppCompatActivity {
         initBATTERYandTEMPERATURE();
         initAutomateSync();
         initBarometer();
+        initDragonLink();
     }
 
     private void initBATTERYandTEMPERATURE() {
@@ -647,7 +702,6 @@ public class MainActivity extends AppCompatActivity {
     {
         if(_barometer!=null)
         {
-
             barometerOn = true;
             Thread BarometricThread = new Thread(runnableBarometric);
             BarometricThread.start();
@@ -693,10 +747,26 @@ public class MainActivity extends AppCompatActivity {
 
         if(intent.getBooleanExtra(CLOUD_SYNC,false))
         {
-            moving_data += CLOUD_SYNC + ".";
+            moving_data += CLOUD_SYNC + ",";
             CloudSwitchData = true;
         }
+
+        if(intent.getBooleanExtra(DRAGON_LINK,false))
+        {
+            moving_data += DRAGON_LINK + ".";
+            _dragonLink = true;
+        }
         Logger.append(moving_data);
+    }
+
+    private void initDragonLink()
+    {
+        if(_dragonLink)
+        {
+            Thread dragonLinkThread = new Thread(sendToDragonMsg);
+            dragonLinkThread.start();
+            Toast.makeText(getApplicationContext(), "Dragon thread start!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

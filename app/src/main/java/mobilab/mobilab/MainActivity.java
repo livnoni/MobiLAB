@@ -1,21 +1,25 @@
 package mobilab.mobilab;
 
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -23,17 +27,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
+import android.util.Base64;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -42,7 +49,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.security.AccessController.getContext;
 
@@ -71,8 +80,9 @@ public class MainActivity extends AppCompatActivity {
     private float current_battery_level;
     private HashMap<String, Object> _camera, _sms, _sound;
     private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false;
-    private long dataId = 0;
-    private int updateCloudInterval = 5;
+    private String dataId;
+    private  String currentTime;
+    private static long idCounter = 0;
     //GPS:
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -89,9 +99,17 @@ public class MainActivity extends AppCompatActivity {
     private int widthResolution = 640; //default
     private int heightResolution = 480; //default
 
-    //private int compressQuality = 10;    //3-100, 80 gives pic on 4 kb, its the best compress without loose high quality
-    private String picPath;
     private boolean runPic = false;
+
+    //Camera Upload pics:
+    private boolean uploadCameraPic = false;
+    private String UPLOAD_URL = "https://mobilab.000webhostapp.com/picture/upload.php";
+    private Bitmap bitmap;
+    private String picPath;
+    private String KEY_IMAGE = "image";
+    private String KEY_NAME = "name";
+    private int compressQuality = 10;    //3-100, 80 gives pic on 4 kb, its the best compress without loose high quality
+
 
     //Sms:
     private boolean sendSMS = false;
@@ -115,9 +133,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             // TODO: change 0.0 values to actual values
-            dataId++;
-            String time = new SimpleDateFormat("dd.MM.yy--HH:mm:ss").format(new Date());
-            sendToServer(dataId, time,latitude, longitude, altitude, current_temperature, current_battery_level,barometerData, 0.0,MODEL,AndroidId);
+            dataId = createID();
+            currentTime = new SimpleDateFormat("dd.MM.yy--HH:mm:ss").format(new Date());
+            sendToServer(dataId, currentTime ,latitude, longitude, altitude, current_temperature, current_battery_level,barometerData, 0.0,MODEL,AndroidId);
         }
     };
     Runnable updateCloudRunnable = new Runnable() {
@@ -140,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void sendToServer(final long ID, final String TIME ,final double latitude, final double longitude, final double altitude, final float Temperature, final float Battery, final double Barometer, final double EXT_Sensors,final String MODEL ,final String AndroidId) {
+    public void sendToServer(final String ID, final String TIME ,final double latitude, final double longitude, final double altitude, final float Temperature, final float Battery, final double Barometer, final double EXT_Sensors,final String MODEL ,final String AndroidId) {
         StringRequest request = new StringRequest(Request.Method.POST, insertUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -157,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> parameters = new HashMap<String, String>();
-                parameters.put("ID", String.valueOf(ID));
+                parameters.put("ID",dataId);
                 parameters.put("TIME", TIME);
                 parameters.put("LatitudeLongitude", String.valueOf(latitude) + "," + String.valueOf(longitude));
                 parameters.put("Altitude", String.valueOf(altitude));
@@ -237,9 +255,13 @@ public class MainActivity extends AppCompatActivity {
                 fos.write(data);
                 Logger.append("picture taken: " + pictureFile.getName());
                 fos.close();
-                //Upload to server:
-                //UpdateNewBitMap(pictureFile.getPath());
-                //uploadImage();
+                if(uploadCameraPic)
+                {
+                    //Upload to server:
+                    UpdateNewBitMap(pictureFile.getPath());
+                    uploadImage();
+                }
+
 
             } catch (FileNotFoundException e) {
                 Logger.append("can't create picture file" + e.getStackTrace());
@@ -265,6 +287,90 @@ public class MainActivity extends AppCompatActivity {
         return mediaFile;
     }
 
+
+    public void UpdateNewBitMap(String path) {
+        try {
+            picPath = path;
+            File f = new File(picPath);
+            Uri imageUri = Uri.fromFile(f);
+            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void uploadImage() {
+        //Showing the progress dialog
+        final ProgressDialog loading = ProgressDialog.show(this, "Uploading...", "Please wait...", false, false);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, UPLOAD_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        //Disimissing the progress dialog
+                        loading.dismiss();
+                        //Showing toast message of the response
+                        Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        //Dismissing the progress dialog
+                        loading.dismiss();
+
+                        //Showing toast
+                        Toast.makeText(MainActivity.this, "Cant upload pic!", Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                //Converting Bitmap to String
+                String image = getStringImage(bitmap);
+                //Getting Image Name
+
+                String name = getNewPicName().trim();
+
+                //Creating parameters
+                Map<String, String> params = new Hashtable<String, String>();
+
+                //Adding parameters
+                params.put("ID",dataId);
+                params.put(KEY_IMAGE, image);
+                params.put(KEY_NAME, name);
+
+                //returning parameters
+                return params;
+            }
+        };
+
+
+        //Creating a Request Queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+
+    }
+
+    public String getStringImage(Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, compressQuality, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
+    public String getNewPicName()
+    {
+        currentTime = new SimpleDateFormat("dd.MM.yy-HH:mm:ss").format(new Date());
+        if(CloudSwitchData==false)
+        {
+            dataId = createID();
+        }
+        String picName = currentTime +"|"+dataId+"|"+latitude+","+ longitude+"|"+altitude+".jpg";
+        Logger.append("picName= "+picName);
+        return picName;
+    }
 
     /////////////////////////////////////////////////////////////////////////TakeSMSThread/////////////////////////////////////////////////////////////////
 
@@ -373,6 +479,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         locationText = (TextView) (findViewById(R.id.locationText));
+
+        currentTime = new SimpleDateFormat("dd.MM.yy--HH:mm:ss").format(new Date());
         incomingIntentData();
         initSensors();
 
@@ -458,7 +566,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initCloud()
     {
-        //ToDo: implement pic upload!
+        uploadCameraPic=true;
     }
 
     private void initGPS() {
@@ -543,11 +651,6 @@ public class MainActivity extends AppCompatActivity {
             barometerOn = true;
             Thread BarometricThread = new Thread(runnableBarometric);
             BarometricThread.start();
-
-
-
-
-
         }
     }
 
@@ -624,18 +727,25 @@ public class MainActivity extends AppCompatActivity {
         {
             barometerOn=false;
         }
+        if(uploadCameraPic)
+        {
+            uploadCameraPic =false;
+        }
         super.onBackPressed();
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Logger.append("event: onPause()");
+    public static synchronized String createID()
+    {
+        return UUID.randomUUID().toString().substring(0,7);
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Logger.append("event: onStop()");
-    }
+//    @Override
+//    protected void onPause() {
+//        Logger.append("event: onPause()");
+//        super.onPause();
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        Logger.append("event: onStop()");
+//        super.onStop();
+//    }
 }

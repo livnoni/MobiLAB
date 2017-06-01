@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
         File mediaFile;
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + getStringData() + ".jpg");
         Toast.makeText(getApplicationContext(), "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_SHORT).show();
-        Logger.append("created picture directory");
+        Logger.append("New Pic: "+getStringData() + ".jpg");
         return mediaFile;
     }
 

@@ -102,7 +102,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         try {
             logger = new Logger();
             Logger.append("logger started");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -21,9 +21,13 @@ public class Logger extends Application {
     private static File logger;
     private static FileOutputStream fos;
 
-    public Logger() throws IOException {
-        logger = getOutputMediaFile();
-        fos = new FileOutputStream(logger);
+    public Logger() {
+        try {
+            logger = getOutputMediaFile();
+            fos = new FileOutputStream(logger);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void append(String message) {

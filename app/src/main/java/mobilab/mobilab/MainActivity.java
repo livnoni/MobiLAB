@@ -27,11 +27,13 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +57,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -86,9 +89,9 @@ public class MainActivity extends AppCompatActivity {
     private float current_temperature;
     private float current_battery_level;
     private HashMap<String, Object> _camera, _sms, _sound;
-    private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false,_dragonLink = false;
+    private Boolean _barometer = false, _externalSensors = false, _temperature = false, _battery = false, _gps = false, _dragonLink = false;
     private String dataId;
-    private  String currentTime;
+    private String currentTime;
     private static long idCounter = 0;
     //GPS:
     private LocationManager locationManager;
@@ -125,9 +128,8 @@ public class MainActivity extends AppCompatActivity {
 
     //Barometer
     private boolean barometerOn = false;
-    private float barometerData;
+    private float barometerData = -1;
     private int barometerTimeOut = 10;//in sec
-
 
 
     /////////////////////////////////////////////////////////////////////////CloudUpload//////////////////////////////////////////////////////////////
@@ -142,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             // TODO: change 0.0 values to actual values
             dataId = createID();
             currentTime = new SimpleDateFormat("dd.MM.yy--HH:mm:ss").format(new Date());
-            sendToServer(dataId, currentTime ,latitude, longitude, altitude, current_temperature, current_battery_level,barometerData, 0.0,MODEL,AndroidId);
+            sendToServer(dataId, currentTime, latitude, longitude, altitude, current_temperature, current_battery_level, barometerData, 0.0, MODEL, AndroidId);
         }
     };
     Runnable updateCloudRunnable = new Runnable() {
@@ -153,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     while (CloudSwitchData) {
                         try {
                             //wait(updateCloudInterval * 1000);
-                            wait(5000);
+                            wait(120000); //2 min
                             uploadHandler.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -165,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void sendToServer(final String ID, final String TIME ,final double latitude, final double longitude, final double altitude, final float Temperature, final float Battery, final double Barometer, final double EXT_Sensors,final String MODEL ,final String AndroidId) {
+    public void sendToServer(final String ID, final String TIME, final double latitude, final double longitude, final double altitude, final float Temperature, final float Battery, final double Barometer, final double EXT_Sensors, final String MODEL, final String AndroidId) {
         StringRequest request = new StringRequest(Request.Method.POST, insertUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -182,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> parameters = new HashMap<String, String>();
-                parameters.put("ID",dataId);
+                parameters.put("ID", dataId);
                 parameters.put("TIME", TIME);
                 parameters.put("LatitudeLongitude", String.valueOf(latitude) + "," + String.valueOf(longitude));
                 parameters.put("Altitude", String.valueOf(altitude));
@@ -197,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
         };
         Logger.append("cloud updated -> ID: " + ID + ";LatitudeLongitude: " + latitude + "," + longitude + ";Altitude: " + altitude + ";Temperature: " + Temperature + ";Battery: " + Battery + ";Barometer: " + Barometer + ";EXT_Sensors: " + EXT_Sensors);
         requestQueue.add(request);
-        Toast.makeText(getApplicationContext(),"Location Sent !", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Location Sent !", Toast.LENGTH_SHORT).show();
 
     }
     /////////////////////////////////////////////////////////////////////////TakePicThread/////////////////////////////////////////////////////////////////
@@ -262,8 +264,7 @@ public class MainActivity extends AppCompatActivity {
                 fos.write(data);
                 Logger.append("picture taken: " + pictureFile.getName());
                 fos.close();
-                if(uploadCameraPic)
-                {
+                if (uploadCameraPic) {
                     //Upload to server:
                     UpdateNewBitMap(pictureFile.getPath());
                     uploadImage();
@@ -290,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
         File mediaFile;
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + getStringData() + ".jpg");
         Toast.makeText(getApplicationContext(), "new Pic created!, " + mediaFile.getName() + "Location: MobiLAB/Pictures", Toast.LENGTH_SHORT).show();
-        Logger.append("New Pic: "+getStringData() + ".jpg");
+        Logger.append("New Pic: " + getStringData() + ".jpg");
         return mediaFile;
     }
 
@@ -341,7 +342,7 @@ public class MainActivity extends AppCompatActivity {
                 Map<String, String> params = new Hashtable<String, String>();
 
                 //Adding parameters
-                params.put("ID",dataId);
+                params.put("ID", dataId);
                 params.put(KEY_IMAGE, image);
                 params.put(KEY_NAME, name);
 
@@ -367,15 +368,13 @@ public class MainActivity extends AppCompatActivity {
         return encodedImage;
     }
 
-    public String getNewPicName()
-    {
+    public String getNewPicName() {
         currentTime = new SimpleDateFormat("dd.MM.yy-HH:mm:ss").format(new Date());
-        if(CloudSwitchData==false)
-        {
+        if (CloudSwitchData == false) {
             dataId = createID();
         }
-        String picName = currentTime +"|"+dataId+"|"+latitude+","+ longitude+"|"+altitude+".jpg";
-        Logger.append("picName= "+picName);
+        String picName = currentTime + "|" + dataId + "|" + latitude + "," + longitude + "|" + altitude + ".jpg";
+        Logger.append("picName= " + picName);
         return picName;
     }
 
@@ -452,8 +451,12 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             SensorManager sensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
             final Sensor pS = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
-            barometerData =pS.getPower();
-            Logger.append("Barometer Pressure:= "+barometerData);
+            if (pS == null) {
+                barometerData = -1;
+            } else {
+                barometerData = pS.getPower();
+            }
+            Logger.append("Barometer Pressure:= " + barometerData);
         }
     };
 
@@ -465,7 +468,7 @@ public class MainActivity extends AppCompatActivity {
                 synchronized (this) {
                     while (barometerOn) {
                         try {
-                            wait(barometerTimeOut *1000);
+                            wait(barometerTimeOut * 1000);
                             HandlerBarometric.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -483,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             try {
                 if (UsbService.class != null) { // if UsbService was correctly binded, Send data
-                    UsbService.write((getStringDataShort()+"---").getBytes());
+                    UsbService.write((getStringDataShort() + "---").getBytes());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -525,9 +528,18 @@ public class MainActivity extends AppCompatActivity {
         incomingIntentData();
         initSensors();
 
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        AndroidId =telephonyManager.getDeviceId();
-        Logger.append("AndroidId= "+AndroidId);
+        int permissionCheck = ContextCompat.checkSelfPermission(this, "android.permission.READ_PHONE_STATE");
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{"android.permission.READ_PHONE_STATE"}, 1);
+        } else {
+            //TODO
+        }
+
+
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        AndroidId = telephonyManager.getDeviceId();
+        Logger.append("AndroidId= " + AndroidId);
 
     }
 
@@ -551,6 +563,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return msg;
     }
+
     public String getStringDataShort() {
         String msg = new SimpleDateFormat("dd-MM_HH:mm:ss").format(new Date());
         if (_gps) {
@@ -604,6 +617,8 @@ public class MainActivity extends AppCompatActivity {
             params.setPictureSize(widthResolution, heightResolution);
             mCamera.setParameters(params);
 
+
+
             //Start thread:
             runPic = true;
             Thread takePicThread = new Thread(takePicRunnable);
@@ -619,9 +634,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initCloud()
-    {
-        uploadCameraPic=true;
+    private void initCloud() {
+        uploadCameraPic = true;
     }
 
     private void initGPS() {
@@ -674,6 +688,8 @@ public class MainActivity extends AppCompatActivity {
         SmsManager smsManager = SmsManager.getDefault();
         String SmsData = getStringData();
         smsManager.sendTextMessage(destinationNumber, null, SmsData, null, null);
+
+
         Logger.append("SMS sent to: " + destinationNumber + " Data sent = " + SmsData);
         Toast.makeText(getApplicationContext(), "SMS set to: " + destinationNumber, Toast.LENGTH_SHORT).show();
     }
@@ -688,20 +704,16 @@ public class MainActivity extends AppCompatActivity {
         locationManager.requestLocationUpdates(GPS, GPS_minTime, GPS_minDistance, locationListener);
     }
 
-    public void initAutomateSync()
-    {
-        if(CloudSwitchData)
-        {
+    public void initAutomateSync() {
+        if (CloudSwitchData) {
             requestQueue = Volley.newRequestQueue(getApplicationContext());
             Thread automateSyncDBThread = new Thread(updateCloudRunnable);
             automateSyncDBThread.start();
         }
     }
 
-    private void initBarometer()
-    {
-        if(_barometer!=null)
-        {
+    private void initBarometer() {
+        if (_barometer != null) {
             barometerOn = true;
             Thread BarometricThread = new Thread(runnableBarometric);
             BarometricThread.start();
@@ -745,24 +757,20 @@ public class MainActivity extends AppCompatActivity {
             moving_data += EXTERNAL_SENSOR + ",";
         }
 
-        if(intent.getBooleanExtra(CLOUD_SYNC,false))
-        {
+        if (intent.getBooleanExtra(CLOUD_SYNC, false)) {
             moving_data += CLOUD_SYNC + ",";
             CloudSwitchData = true;
         }
 
-        if(intent.getBooleanExtra(DRAGON_LINK,false))
-        {
+        if (intent.getBooleanExtra(DRAGON_LINK, false)) {
             moving_data += DRAGON_LINK + ".";
             _dragonLink = true;
         }
         Logger.append(moving_data);
     }
 
-    private void initDragonLink()
-    {
-        if(_dragonLink)
-        {
+    private void initDragonLink() {
+        if (_dragonLink) {
             Thread dragonLinkThread = new Thread(sendToDragonMsg);
             dragonLinkThread.start();
             Toast.makeText(getApplicationContext(), "Dragon thread start!", Toast.LENGTH_SHORT).show();
@@ -789,23 +797,23 @@ public class MainActivity extends AppCompatActivity {
         if (sendSMS) {
             sendSMS = false;
         }
-        if(CloudSwitchData)
-        {
-            CloudSwitchData=false;
+        if (CloudSwitchData) {
+            CloudSwitchData = false;
         }
-        if(barometerOn)
-        {
-            barometerOn=false;
+        if (barometerOn) {
+            barometerOn = false;
         }
-        if(uploadCameraPic)
-        {
-            uploadCameraPic =false;
+        if (uploadCameraPic) {
+            uploadCameraPic = false;
         }
         super.onBackPressed();
     }
-    public static synchronized String createID()
-    {
-        return UUID.randomUUID().toString().substring(0,7);
+
+    public static synchronized String createID() {
+        //return UUID.randomUUID().toString().substring(0, 7);
+        Random rand = new Random();
+        int  num = rand.nextInt(99999999) + 10000000;
+        return Integer.toString(num);
     }
 //    @Override
 //    protected void onPause() {

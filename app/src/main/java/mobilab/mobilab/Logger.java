@@ -1,7 +1,10 @@
 package mobilab.mobilab;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import java.io.File;
@@ -21,11 +24,34 @@ public class Logger extends Application {
     private static File logger;
     private static FileOutputStream fos;
 
-    public Logger() throws IOException {
+    public Logger(Activity activity) throws IOException {
         logger = getOutputMediaFile();
+        verifyStoragePermissions(activity);
         fos = new FileOutputStream(logger);
+
+    }
+///////////////////////////////
+
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE"
+    };
+
+    public static void verifyStoragePermissions(Activity activity) {
+        int permission = ActivityCompat.checkSelfPermission(activity, "android.permission.WRITE_EXTERNAL_STORAGE");
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
     }
 
+
+    /////////////////////////////
     public static void append(String message) {
         try {
             fos.write(("[" + (new Date(System.currentTimeMillis())) + "]:\t" + message + "\n").getBytes());
@@ -37,8 +63,9 @@ public class Logger extends Application {
 
     private File getOutputMediaFile() {
         File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), NAME);
+        Log.e("koko", Environment.getExternalStorageDirectory().toString());
         if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
+            if (!mediaStorageDir.mkdir()) {
                 Log.e(TAG, ERROR);
                 return null;
             }

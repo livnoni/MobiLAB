@@ -525,6 +525,7 @@ public class MainActivity extends AppCompatActivity {
         locationText = (TextView) (findViewById(R.id.locationText));
 
         currentTime = new SimpleDateFormat("dd.MM.yy--HH:mm:ss").format(new Date());
+        dataId = createID();
         incomingIntentData();
         initSensors();
 

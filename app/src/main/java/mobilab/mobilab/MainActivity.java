@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     private String picPath;
     private String KEY_IMAGE = "image";
     private String KEY_NAME = "name";
-    private int compressQuality = 10;    //3-100, 80 gives pic on 4 kb, its the best compress without loose high quality
+    private int compressQuality = 100;    //3-100, 80 gives pic on 4 kb, its the best compress without loose high quality
 
 
     //Sms:
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     while (CloudSwitchData) {
                         try {
                             //wait(updateCloudInterval * 1000);
-                            wait(120000); //2 min
+                            wait(10000); //10 sec
                             uploadHandler.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -715,7 +715,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initBarometer() {
         if (_barometer != null) {
-            barometerOn = true;
+            barometerOn = false;
             Thread BarometricThread = new Thread(runnableBarometric);
             BarometricThread.start();
         }

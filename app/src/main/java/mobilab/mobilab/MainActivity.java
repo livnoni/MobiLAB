@@ -718,6 +718,7 @@ public class MainActivity extends AppCompatActivity {
             barometerOn = false;
             //Thread BarometricThread = new Thread(runnableBarometric);
             //BarometricThread.start();
+
         }
     }
 

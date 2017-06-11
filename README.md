@@ -8,11 +8,11 @@ We created MobiLAB application during the 3rd year of our degree in Computer Sci
 to use MobiLAB, please clone the following git, or download directly the [apk](https://github.com/livnoni/MobiLAB/blob/master/MobiLAB.apk
 ) file.
 
+## Please read our [user manual](https://github.com/livnoni/MobiLAB/blob/master/user-manual-MobiLab_PDF.pdf) before you use the app.
+
+
 For viewing the data collacted by the application, please visit [MobiLAB website](http://94.188.155.162/MobiLAB/).
 ![alt text](https://github.com/livnoni/MobiLAB/blob/master/pictures/website.PNG)
-
-
-please read our [Wiki](https://github.com/livnoni/MobiLAB/wiki/_new) before you use the app.
 
 You can see [here](https://www.youtube.com/watch?v=EBzp8FPsAeg) our video from the last meteorological balloon blow.
 

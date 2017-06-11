@@ -6,6 +6,8 @@ We created MobiLAB during our final year of our degree in Computer Science.
 for use MobiLAB, please clone the following git, or download directly the [apk](https://github.com/livnoni/MobiLAB/blob/master/MobiLAB.apk
 ) file.
 
+please read our [Wiki](https://github.com/livnoni/MobiLAB/wiki/_new) before you use the app.
+
 # *MobiLAB architecture:*
 
 

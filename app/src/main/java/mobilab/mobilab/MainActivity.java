@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Camera Upload pics:
     private boolean uploadCameraPic = false;
-    private String UPLOAD_URL = "https://mobilab.000webhostapp.com/picture/upload.php";
+    private String UPLOAD_URL = "http://94.188.155.162/picture/upload.php";
     private Bitmap bitmap;
     private String picPath;
     private String KEY_IMAGE = "image";
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
     /////////////////////////////////////////////////////////////////////////CloudUpload//////////////////////////////////////////////////////////////
     com.android.volley.RequestQueue requestQueue;
     private static String AndroidId;
-    String insertUrl = "http://mobilab.000webhostapp.com/telemetry/insertData.php";
+    String insertUrl = "http://94.188.155.162//telemetry/insertData.php";
     String MODEL = Build.MANUFACTURER + " " + Build.MODEL;
 
     Handler uploadHandler = new Handler() {

@@ -53,11 +53,13 @@ public class Logger extends Application {
 
     /////////////////////////////
     public static void append(String message) {
-        try {
-            fos.write(("[" + (new Date(System.currentTimeMillis())) + "]:\t" + message + "\n").getBytes());
-            Log.i(_logger, message + "");
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (fos != null) {
+            try {
+                fos.write(("[" + (new Date(System.currentTimeMillis())) + "]:\t" + message + "\n").getBytes());
+                Log.i(_logger, message + "");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

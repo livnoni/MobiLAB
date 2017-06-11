@@ -58,7 +58,9 @@ public class Logger extends Application {
                 fos.write(("[" + (new Date(System.currentTimeMillis())) + "]:\t" + message + "\n").getBytes());
                 Log.i(_logger, message + "");
             } catch (IOException e) {
+                Logger.append(e.getMessage());
                 e.printStackTrace();
+
             }
         }
     }

@@ -159,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
                             uploadHandler.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                            Logger.append(e.getMessage());
                         }
                     }
 
@@ -212,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
                 mCamera.takePicture(null, null, mPicture);
             } catch (Exception e) {
                 e.printStackTrace();
+                Logger.append(e.getMessage());
+
             }
         }
     };
@@ -228,6 +231,8 @@ public class MainActivity extends AppCompatActivity {
                             handler.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                            Logger.append(e.getMessage());
+
                         }
                     }
 
@@ -247,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             camera = android.hardware.Camera.open();
         } catch (Exception e) {
+            Logger.append(e.getMessage());
             Logger.append("cannot access camera or does not exist");
         }
         return camera;
@@ -272,9 +278,13 @@ public class MainActivity extends AppCompatActivity {
 
 
             } catch (FileNotFoundException e) {
-                Logger.append("can't create picture file" + e.getStackTrace());
+//                Logger.append("can't create picture file" + e.getStackTrace());
+                Logger.append(e.getMessage());
+
             } catch (IOException e) {
-                Logger.append("taking picture failed: " + e.getStackTrace());
+//                Logger.append("taking picture failed: " + e.getStackTrace());
+                Logger.append(e.getMessage());
+
             }
         }
     };
@@ -304,6 +314,7 @@ public class MainActivity extends AppCompatActivity {
             bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
         } catch (IOException e) {
             e.printStackTrace();
+            Logger.append(e.getMessage());
         }
     }
 
@@ -400,6 +411,8 @@ public class MainActivity extends AppCompatActivity {
                             handlerSMS.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                            Logger.append(e.getMessage());
+
                         }
                     }
 
@@ -436,7 +449,7 @@ public class MainActivity extends AppCompatActivity {
 
                         } catch (InterruptedException e) {
                             e.printStackTrace();
-                            Logger.append(e.getStackTrace().toString());
+                            Logger.append(e.getMessage());
                         }
                     }
 
@@ -472,6 +485,8 @@ public class MainActivity extends AppCompatActivity {
                             HandlerBarometric.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                            Logger.append(e.getMessage());
+
                         }
                     }
 
@@ -490,6 +505,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                Logger.append(e.getMessage());
+
             }
         }
     };
@@ -506,6 +523,8 @@ public class MainActivity extends AppCompatActivity {
                             DragonHandler.sendEmptyMessage(0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                            Logger.append(e.getMessage());
+
                         }
                     }
 

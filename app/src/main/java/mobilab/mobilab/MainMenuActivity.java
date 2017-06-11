@@ -633,6 +633,8 @@ public class MainMenuActivity extends AppCompatActivity {
             Logger.onDestroy();
         } catch (IOException e) {
             e.printStackTrace();
+            Logger.append(e.getMessage());
+
         }
     }
 

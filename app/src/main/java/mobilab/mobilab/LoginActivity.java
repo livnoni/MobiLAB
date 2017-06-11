@@ -104,6 +104,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Logger.append("logger started");
         } catch (IOException e) {
             e.printStackTrace();
+            Logger.append(e.getMessage());
         }
     }
 
@@ -472,6 +473,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // Simulate network access.
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
+                Logger.append(e.getMessage());
                 return false;
             }
 

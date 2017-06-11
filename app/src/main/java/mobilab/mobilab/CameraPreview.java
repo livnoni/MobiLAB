@@ -30,7 +30,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setDisplayOrientation(90);
             mCamera.startPreview();
         } catch (IOException e) {
-            Logger.append("camera failed: " + e.getStackTrace());
+            Logger.append("camera failed: ");
+            Logger.append(e.getMessage());
         }
     }
 
@@ -52,6 +53,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.startPreview();
         } catch (Exception e) {
             // intentionally left blank for a test
+            Logger.append(e.getMessage());
             Logger.append("surface change fail");
         }
     }

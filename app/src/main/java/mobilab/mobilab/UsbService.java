@@ -63,6 +63,8 @@ public class UsbService extends Service {
                     mHandler.obtainMessage(MESSAGE_FROM_SERIAL_PORT, data).sendToTarget();
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
+                Logger.append(e.getMessage());
+
             }
         }
     };

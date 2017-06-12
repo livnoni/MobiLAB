@@ -16,7 +16,7 @@ import java.util.Date;
 
 public class Logger extends Application {
     private static final String NAME = "MobiLAB";
-    private static final String FILE_NAME = "mainlog.txt";
+    private static final String FILE_NAME = "mainlog";
     private static final String SHUTDOWN = "logger shut down.";
     private static final String ERROR = "failed to create directory";
     private static final String TAG = "DEBUG";
@@ -67,7 +67,6 @@ public class Logger extends Application {
 
     private File getOutputMediaFile() {
         File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), NAME);
-        Log.e("koko", Environment.getExternalStorageDirectory().toString());
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdir()) {
                 Log.e(TAG, ERROR);
@@ -75,7 +74,7 @@ public class Logger extends Application {
             }
         }
         // Create a media file name
-        return new File(mediaStorageDir.getPath() + File.separator + FILE_NAME);
+        return new File(mediaStorageDir.getPath() + File.separator + FILE_NAME+"_"+System.currentTimeMillis()+".txt");
     }
 
     public static void onDestroy() throws IOException {

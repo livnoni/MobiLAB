@@ -158,6 +158,11 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
         startButton = (Button) findViewById(R.id.button);
         automateCloudSyncSwitch = (Switch) findViewById(R.id.CloudTelemetrySwitch);
         DragonLinkSwitch = (Switch) findViewById(R.id.DragonLinkSwitch);

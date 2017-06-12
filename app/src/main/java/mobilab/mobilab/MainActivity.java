@@ -211,6 +211,15 @@ public class MainActivity extends AppCompatActivity {
             try {
                 mCamera.startPreview(); //important! it allow to take multi pics!
                 mCamera.takePicture(null, null, mPicture);
+
+
+
+//                mCamera = getCameraInstance();
+//                mCameraPreview = new CameraPreview(getApplicationContext(), mCamera);
+//                final FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
+//                preview.addView(mCameraPreview);
+
+
             } catch (Exception e) {
                 e.printStackTrace();
                 Logger.append(e.getMessage());
@@ -269,6 +278,11 @@ public class MainActivity extends AppCompatActivity {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
                 Logger.append("picture taken: " + pictureFile.getName());
+                ////////////////////////////////////////////////////////////////////////////////////
+                //This is very important!!!!!
+                //It return the view after taking photo!!!!!
+                mCamera.startPreview();
+                /////////////////////////////////////////////////////////////////////////////////////
                 fos.close();
                 if (uploadCameraPic) {
                     //Upload to server:

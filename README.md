@@ -14,7 +14,7 @@ to use MobiLAB, please clone the following git, or download directly the [apk](h
 ## Please read our [user manual](https://github.com/livnoni/MobiLAB/blob/master/user-manual-MobiLab_PDF.pdf) before you use the app.
 
 
-For viewing the data collacted by the application, please visit [MobiLAB website](http://94.188.155.162/MobiLAB/).
+For viewing the data collacted by the application, please visit [MobiLAB website](http://evron.pro/mobilab/MobiLAB/).
 ![alt text](https://github.com/livnoni/MobiLAB/blob/master/pictures/website.PNG)
 
 You can see [here](https://www.youtube.com/watch?v=EBzp8FPsAeg) our video from the last meteorological balloon blow.

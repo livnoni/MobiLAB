@@ -12,7 +12,7 @@ to use MobiLAB, please clone the following git, or download directly the [apk](h
 ) file.
 
 ## Please read our [user manual](https://github.com/livnoni/MobiLAB/blob/master/user-manual-MobiLab_PDF.pdf) before you use the app.
-## You can see our presentaion [here](https://github.com/livnoni/MobiLAB/blob/master/MobiLAB_Presentetion.pptx).
+## You can see our presentaiton [here](https://github.com/livnoni/MobiLAB/blob/master/MobiLAB_Presentetion.pptx).
 
 
 For viewing the data collacted by the application, please visit [MobiLAB website](http://evron.pro/mobilab/MobiLAB/).
